@@ -20,7 +20,7 @@ const Login: React.FC = () => {
 
     return (
         <div>
-        <form onSubmit={handleLogin} className="flex flex-col p-16 bg-gladiolenfg text-gladiolenbg shadow-md rounded-xl">
+        <form onSubmit={handleLogin} className="flex flex-col p-16 bg-white text-gladiolentext shadow-md rounded-xl">
             <h1 className="text-3xl font-bold mb-4">Welkom bij GladiolenRegister!</h1>
             <input
                 type="text"
@@ -37,11 +37,11 @@ const Login: React.FC = () => {
                 className="p-2 border border-gray-300 rounded-md mb-0"
             />
             <Link href={"/paswoord"} className="text-right mb-4">Paswoord vergeten?</Link>
-            <Button type="submit" className="bg-gladiolenbg text-gladiolenfg hover:scale-105">
+            <Button type="submit" className="bg-gladiolentext text-white hover:scale-105">
                Login
             </Button>
         </form>
-            <div className="text-gladiolenfg py-2">
+            <div className="text-white py-2">
                 Nog geen account? Registreer je <Link href={"/register"}>hier.</Link>
             </div>
         </div>

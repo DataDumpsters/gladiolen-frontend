@@ -11,6 +11,7 @@ export default {
       colors: {
         gladiolenbg: "#FF460D",
         gladiolenfg: "#FFBCE5",
+        gladiolentext: "#950F66",
       },
     },
   },
