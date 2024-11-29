@@ -9,8 +9,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        gladiolenbg: "#FF460D",
+        gladiolenfg: "#FFBCE5",
+        gladiolentext: "#950F66",
       },
     },
   },
