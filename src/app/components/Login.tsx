@@ -4,10 +4,12 @@ import React, { useState } from "react";
 import Button from "@/app/components/Button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Forgotpasswordmodal from "@/app/components/modals/Forgotpasswordmodal";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
   const handleLogin = (e: React.FormEvent) => {
@@ -40,12 +42,18 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           className="p-2 border border-gray-300 rounded-md mb-0"
         />
-        <Link href={"/paswoord"} className="text-right mb-4">
+        <Link
+          href={"#"}
+          onClick={() => setIsModalOpen(true)}
+          className="text-right mb-4">
           Paswoord vergeten?
         </Link>
-        <Button
-          type="submit"
-          className="bg-gladiolentext text-white hover:scale-105">
+        <Forgotpasswordmodal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+
+        <Button className="bg-gladiolentext text-white hover:scale-105">
           Login
         </Button>
       </form>
