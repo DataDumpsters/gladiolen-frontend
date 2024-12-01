@@ -5,6 +5,7 @@ import Button from "@/app/components/Button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Forgotpasswordmodal from "@/app/components/modals/Forgotpasswordmodal";
+import Modal from "@/app/components/Modal";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -48,11 +49,9 @@ const Login = () => {
           className="text-right mb-4">
           Paswoord vergeten?
         </Link>
-        <Forgotpasswordmodal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-
+        <Modal isOpen={isModalOpen}>
+          <Forgotpasswordmodal onClose={() => setIsModalOpen(false)} />
+        </Modal>
         <Button className="bg-gladiolentext text-white hover:scale-105">
           Login
         </Button>
