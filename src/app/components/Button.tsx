@@ -10,6 +10,7 @@ interface ButtonProps {
 const Button = ({ onClick, children, className, type }: ButtonProps) => {
   return (
     <button
+      type={type || "submit"}
       onClick={onClick}
       className={`rounded-xl border border-solid border-transparent transition-colors flex items-center justify-center gap-2 text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 ${className}`}>
       {children}
