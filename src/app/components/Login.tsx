@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "@/app/components/Button";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import Forgotpasswordmodal from "@/app/components/modals/Forgotpasswordmodal";
 import Modal from "@/app/components/Modal";
 import TokenOTPmodal from "@/app/components/modals/TokenOTPmodal";
+import RegisterUsermodal from "@/app/components/modals/RegisterUsermodal";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -14,7 +15,13 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [otpModalOpen, setOtpModalOpen] = useState(false);
-  const router = useRouter();
+  const [registerModalOpen, setRegisterModalOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  // const router = useRouter();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,9 +41,8 @@ const Login = () => {
         }),
       });
       if (response.ok) {
-        setMessage("Login succesful!");
         setOtpModalOpen(true);
-        // handle succesfull login
+        // handle successful login
       } else {
         const errorMessage = await response.text();
         setMessage(`Login Failed: ${errorMessage}`);
@@ -49,6 +55,10 @@ const Login = () => {
       }
     }
   };
+
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <div>
@@ -90,8 +100,14 @@ const Login = () => {
       </Modal>
       {message && <p>{message}</p>}
       <div className="text-white py-2">
-        Nog geen account? Registreer je <Link href={"/register"}>hier.</Link>
+        Nog geen account? Registreer je{" "}
+        <Link href="#" onClick={() => setRegisterModalOpen(true)}>
+          <span className="font-bold underline">hier</span>.
+        </Link>
       </div>
+      <Modal isOpen={registerModalOpen}>
+        <RegisterUsermodal onClose={() => setRegisterModalOpen(false)} />
+      </Modal>
     </div>
   );
 };
