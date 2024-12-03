@@ -6,12 +6,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Forgotpasswordmodal from "@/app/components/modals/Forgotpasswordmodal";
 import Modal from "@/app/components/Modal";
+import TokenOTPmodal from "@/app/components/modals/TokenOTPmodal";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [mesasge, setMessage] = useState("");
+  const [message, setMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [otpModalOpen, setOtpModalOpen] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -33,6 +35,7 @@ const Login = () => {
       });
       if (response.ok) {
         setMessage("Login succesful!");
+        setOtpModalOpen(true);
         // handle succesfull login
       } else {
         const errorMessage = await response.text();
@@ -57,7 +60,7 @@ const Login = () => {
         </h1>
         <input
           type="text"
-          placeholder="Gebruikersnaam"
+          placeholder="Email"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="p-2 border border-gray-300 rounded-md mb-4"
@@ -82,7 +85,10 @@ const Login = () => {
           Login
         </Button>
       </form>
-      {mesasge && <p>{mesasge}</p>}
+      <Modal isOpen={otpModalOpen}>
+        <TokenOTPmodal onClose={() => setOtpModalOpen(false)} />
+      </Modal>
+      {message && <p>{message}</p>}
       <div className="text-white py-2">
         Nog geen account? Registreer je <Link href={"/register"}>hier.</Link>
       </div>
