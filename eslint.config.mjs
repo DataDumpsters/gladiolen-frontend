@@ -4,6 +4,7 @@ import tseslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import pluginReact from "eslint-plugin-react";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import eslintConfigNext from "eslint-config-next";
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
@@ -21,6 +22,12 @@ export default [
       ...pluginJs.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
       ...pluginReact.configs.flat.recommended.rules,
+      ...eslintConfigNext.rules,
+    },
+    settings: {
+      react: {
+        version: "detect",
+      },
     },
   },
   eslintPluginPrettierRecommended,

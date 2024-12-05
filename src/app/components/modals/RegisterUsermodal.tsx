@@ -1,11 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Button from "@/app/components/Button";
 
 interface RegisterUsermodalProps {
   onClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  roles: string[];
+  sizes: string[];
+  sexes: string[];
+  jobs: string[];
 }
 
-const RegisterUsermodal = ({ onClose }: RegisterUsermodalProps) => {
+const RegisterUsermodal = ({
+  onClose,
+  roles,
+  sizes,
+  sexes,
+  jobs,
+}: RegisterUsermodalProps) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -28,95 +38,6 @@ const RegisterUsermodal = ({ onClose }: RegisterUsermodalProps) => {
     isPasswordValid(password) &&
     isPasswordValid(checkPassword) &&
     password === checkPassword;
-
-  const [roles, setRoles] = useState<string[]>([]);
-  const [sizes, setSizes] = useState<string[]>([]);
-  const [sexes, setSexes] = useState<string[]>([]);
-  const [jobs, setJobs] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/user/roles");
-        if (response.ok) {
-          const data = await response.json();
-          setRoles(data);
-        } else {
-          console.error("Failed to fetch roles");
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error(`An error has occured: ${error.message}`);
-        } else {
-          console.error(`An unexpected error occured`);
-        }
-      }
-    };
-    fetchRoles();
-  }, []);
-
-  useEffect(() => {
-    const fetchSizes = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/tshirt/sizes");
-        if (response.ok) {
-          const data = await response.json();
-          setSizes(data);
-        } else {
-          console.error("Failed to fetch roles");
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error(`An error has occured: ${error.message}`);
-        } else {
-          console.error(`An unexpected error occured`);
-        }
-      }
-    };
-    fetchSizes();
-  }, []);
-
-  useEffect(() => {
-    const fetchSexes = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/tshirt/sexes");
-        if (response.ok) {
-          const data = await response.json();
-          setSexes(data);
-        } else {
-          console.error("Failed to fetch roles");
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error(`An error has occured: ${error.message}`);
-        } else {
-          console.error(`An unexpected error occured`);
-        }
-      }
-    };
-    fetchSexes();
-  }, []);
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/tshirt/jobs");
-        if (response.ok) {
-          const data = await response.json();
-          setJobs(data);
-        } else {
-          console.error("Failed to fetch roles");
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error(`An error has occured: ${error.message}`);
-        } else {
-          console.error(`An unexpected error occured`);
-        }
-      }
-    };
-    fetchJobs();
-  }, []);
 
   const validateField = (name: string, value: string) => {
     let error = "";

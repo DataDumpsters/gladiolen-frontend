@@ -1,9 +1,6 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import Button from "@/app/components/Button";
 import Link from "next/link";
-// import { useRouter } from "next/navigation";
 import Forgotpasswordmodal from "@/app/components/modals/Forgotpasswordmodal";
 import Modal from "@/app/components/Modal";
 import TokenOTPmodal from "@/app/components/modals/TokenOTPmodal";
@@ -17,18 +14,35 @@ const Login = () => {
   const [otpModalOpen, setOtpModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  // const router = useRouter();
+  const [roles, setRoles] = useState([]);
+  const [sizes, setSizes] = useState([]);
+  const [sexes, setSexes] = useState([]);
+  const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
     setIsClient(true);
+    // Fetch roles, sizes, sexes, and jobs
+    const fetchData = async () => {
+      const rolesResponse = await fetch("http://localhost:8080/api/user/roles");
+      const sizesResponse = await fetch(
+        "http://localhost:8080/api/tshirt/sizes",
+      );
+      const sexesResponse = await fetch(
+        "http://localhost:8080/api/tshirt/sexes",
+      );
+      const jobsResponse = await fetch("http://localhost:8080/api/tshirt/jobs");
+
+      setRoles(await rolesResponse.json());
+      setSizes(await sizesResponse.json());
+      setSexes(await sexesResponse.json());
+      setJobs(await jobsResponse.json());
+    };
+
+    fetchData();
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    // console.log("Username:", username);
-    // console.log("Password:", password);
-    // router.push("/dashboards/admin");
     try {
       const response = await fetch("http://localhost:8080/login", {
         method: "POST",
@@ -42,7 +56,6 @@ const Login = () => {
       });
       if (response.ok) {
         setOtpModalOpen(true);
-        // handle successful login
       } else {
         const errorMessage = await response.text();
         setMessage(`Login Failed: ${errorMessage}`);
@@ -106,7 +119,13 @@ const Login = () => {
         </Link>
       </div>
       <Modal isOpen={registerModalOpen}>
-        <RegisterUsermodal onClose={() => setRegisterModalOpen(false)} />
+        <RegisterUsermodal
+          onClose={() => setRegisterModalOpen(false)}
+          roles={roles}
+          sizes={sizes}
+          sexes={sexes}
+          jobs={jobs}
+        />
       </Modal>
     </div>
   );

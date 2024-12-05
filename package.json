@@ -10,31 +10,32 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@next/eslint-plugin-next": "^15.0.3",
+    "eslint-config-next": "^15.0.3",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106"
   },
   "devDependencies": {
-    "@eslint/js": "^9.15.0",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "@typescript-eslint/eslint-plugin": "^8.16.0",
-    "@typescript-eslint/parser": "^8.16.0",
-    "eslint": "^9.15.0",
-    "eslint-config-next": "15.0.3",
+    "@eslint/js": "^9.16.0",
+    "@types/node": "^20.17.9",
+    "@types/react": "^18.3.13",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-define-config": "^2.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.37.2",
-    "globals": "^15.12.0",
+    "globals": "^15.13.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
-    "postcss": "^8",
+    "postcss": "^8.4.49",
     "prettier": "3.4.1",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5",
-    "typescript-eslint": "^8.16.0"
+    "tailwindcss": "^3.4.16",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.17.0"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
