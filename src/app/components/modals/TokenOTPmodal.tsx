@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import Button from "../Button";
+import { useRouter } from "next/navigation";
+import { useAppContext } from "../../providers/context";
 
 interface TokenOTPmodalProps {
   onClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -8,11 +10,14 @@ interface TokenOTPmodalProps {
 const TokenOTPmodal = ({ onClose }: TokenOTPmodalProps) => {
   const [token, setToken] = useState("");
   const [isTokenValid, setIsTokenValid] = useState(false);
+  const router = useRouter();
+  const { basename } = useAppContext();
 
   const handleTokenSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle token logic here
     setIsTokenValid(true);
+    router.push(`${basename}`);
     console.log("Token:", token);
     // Add logic to check if the token is valid
   };
