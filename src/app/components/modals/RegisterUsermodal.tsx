@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Button from "@/app/components/Button";
+import Inputfield from "@/app/components/Inputfield";
 
 interface RegisterUsermodalProps {
   onClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -7,6 +8,16 @@ interface RegisterUsermodalProps {
   sizes: string[];
   sexes: string[];
   jobs: string[];
+  unions: {
+    id: number;
+    name: string;
+    address: string;
+    postalCode: number;
+    municipality: string;
+    vatNumber: string;
+    accountNumber: string;
+    numberOfParkingTickets: number;
+  }[]; // Adjust the type based on your actual data structure
 }
 
 const RegisterUsermodal = ({
@@ -15,6 +26,7 @@ const RegisterUsermodal = ({
   sizes,
   sexes,
   jobs,
+  unions,
 }: RegisterUsermodalProps) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -25,11 +37,12 @@ const RegisterUsermodal = ({
   const [password, setPassword] = useState("");
   const [checkPassword, setCheckPassword] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
   const [size, setSize] = useState("");
   const [sex, setSex] = useState("");
   const [job, setJob] = useState("");
+  const [unionId, setUnionId] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
+  const [isUserMade, setIsUserMade] = useState(false);
 
   const isPasswordValid = (password: string) => {
     return password.length >= 8 && /(?=.*[a-zA-Z])(?=.*\d)/.test(password);
@@ -78,6 +91,27 @@ const RegisterUsermodal = ({
     setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
   };
 
+  const checkEmailExists = async (email: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/user/check-email?email=${email}`,
+      );
+      if (response.ok) {
+        const exists = await response.json();
+        if (exists) {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            email: "Er bestaat reeds een gebruiker met dit emailadres",
+          }));
+        } else {
+          setErrors((prevErrors) => ({ ...prevErrors, email: "" }));
+        }
+      }
+    } catch (error) {
+      console.error("Failed to check email", error);
+    }
+  };
+
   const handleUserRegistration = (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = Object.keys(errors).reduce(
@@ -114,10 +148,12 @@ const RegisterUsermodal = ({
               job,
               quantity,
             },
+            union: unions.find((u) => u.id === parseInt(unionId)),
           }),
         });
         if (response.ok) {
           console.log("User registered successfully");
+          setIsUserMade(true);
         } else {
           const errorMessage = await response.text();
           console.error(`Registration Failed: ${errorMessage}`);
@@ -143,55 +179,41 @@ const RegisterUsermodal = ({
       <div className="flex flex-row gap-2">
         <div className="flex flex-col gap-1">
           <h3 className="text-xl font-bold">Gebruiker Details</h3>
-          <input
-            type="text"
+          <Inputfield
             name="firstName"
             placeholder="voornaam"
             value={firstName}
-            onChange={(e) => {
-              setFirstName(e.target.value);
-              validateField("firstName", e.target.value);
-            }}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5"
+            setValue={setFirstName}
+            validateField={validateField}
           />
           {errors.firstName && (
             <p className="text-red-500">{errors.firstName}</p>
           )}
-          <input
-            type="text"
+          <Inputfield
             name="lastName"
             placeholder="achternaam"
             value={lastName}
-            onChange={(e) => {
-              setLastName(e.target.value);
-              validateField("lastName", e.target.value);
-            }}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5"
+            setValue={setLastName}
+            validateField={validateField}
           />
           {errors.lastName && <p className="text-red-500">{errors.lastName}</p>}
-          <input
-            type="text"
+          <Inputfield
             name="phoneNumber"
             placeholder="telefoonnummer"
             value={phoneNumber}
-            onChange={(e) => {
-              setPhoneNumber(e.target.value);
-            }}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5"
+            setValue={setPhoneNumber}
+            validateField={validateField}
           />
           {errors.phoneNumber && (
             <p className="text-red-500">{errors.phoneNumber}</p>
           )}
-          <input
-            type="email"
+          <Inputfield
             name="email"
             placeholder="email"
             value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              validateField("email", e.target.value);
-            }}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5"
+            setValue={setEmail}
+            validateField={validateField}
+            onBlur={() => checkEmailExists(email)}
           />
           {errors.email && <p className="text-red-500">{errors.email}</p>}
         </div>
@@ -226,28 +248,20 @@ const RegisterUsermodal = ({
           {errors.registryNumber && (
             <p className="text-red-500">{errors.registryNumber}</p>
           )}
-          <input
-            type="password"
+          <Inputfield
             name="password"
             placeholder="wachtwoord"
             value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              validateField("password", e.target.value);
-            }}
-            className={`rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5 ${passwordsMatch ? "shadow-md shadow-green-500" : ""}`}
+            setValue={setPassword}
+            validateField={validateField}
           />
           {errors.password && <p className="text-red-500">{errors.password}</p>}
-          <input
-            type="password"
+          <Inputfield
             name="checkPassword"
-            placeholder="voer je wachtwoord nogmaals in"
+            placeholder="check wachtwoord"
             value={checkPassword}
-            onChange={(e) => {
-              setCheckPassword(e.target.value);
-              validateField("checkPassword", e.target.value);
-            }}
-            className={`rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5 ${passwordsMatch ? "shadow-md shadow-green-500" : ""}`}
+            setValue={setCheckPassword}
+            validateField={validateField}
           />
           {errors.checkPassword && (
             <p className="text-red-500">{errors.checkPassword}</p>
@@ -291,6 +305,18 @@ const RegisterUsermodal = ({
               </option>
             ))}
           </select>
+          <select
+            name="union"
+            value={unionId}
+            onChange={(e) => setUnionId(e.target.value)}
+            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5">
+            <option value="">Selecteer een vereniging</option>
+            {unions.map((union) => (
+              <option key={union.id} value={union.id}>
+                {union.name}
+              </option>
+            ))}
+          </select>
           <div className="flex items-center">
             <label className="mr-2">Vrijdag & zaterdag?</label>
             <input
@@ -319,6 +345,11 @@ const RegisterUsermodal = ({
             Annuleren
           </Button>
         </div>
+        {isUserMade && (
+          <div className="flex justify-end text-2xl text-green-400">
+            <p>&#x2714; Gebruiker aangemaakt</p>
+          </div>
+        )}
       </div>
     </div>
   );

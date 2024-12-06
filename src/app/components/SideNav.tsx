@@ -15,6 +15,9 @@ const SideNav = () => {
           <Link href="/medewerkers">Medewerkers</Link>
         </li>
         <li>
+          <Link href="/bezoekers">Organisatie</Link>
+        </li>
+        <li>
           <Link href="/statistieken">Statistieken</Link>
         </li>
       </ul>
