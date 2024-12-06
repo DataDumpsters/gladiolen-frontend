@@ -1,13 +1,15 @@
-import React from "react";
-import SideNav from "@/app/components/SideNav";
+"use client";
 
-export default function AdminHome() {
+import React from "react";
+import Layout from "@/app/dashboards/admin/layout";
+
+const AdminHome = () => {
   return (
-    <div className="flex">
-      <SideNav />
-      <div className="flex flex-col flex-grow p-8">
-        <h1>Admin Name</h1>
-      </div>
-    </div>
+    <Layout>
+      <h1>Welcome to the Admin Dashboard</h1>{" "}
+      {/* You can replace this with your actual content */}
+    </Layout>
   );
-}
+};
+
+export default AdminHome;
