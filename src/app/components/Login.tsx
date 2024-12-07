@@ -9,7 +9,7 @@ import TokenOTPmodal from "@/app/components/modals/TokenOTPmodal";
 import RegisterUsermodal from "@/app/components/modals/RegisterUsermodal";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,8 +55,8 @@ const Login = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username,
-          password,
+          emailId: emailId,
+          password: password,
         }),
       });
       if (response.ok) {
@@ -89,8 +89,8 @@ const Login = () => {
         <input
           type="text"
           placeholder="Email"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={emailId}
+          onChange={(e) => setEmailId(e.target.value)}
           className="p-2 border border-gray-300 rounded-md mb-4"
         />
         <input
@@ -114,7 +114,7 @@ const Login = () => {
         </Button>
       </form>
       <Modal isOpen={otpModalOpen}>
-        <TokenOTPmodal onClose={() => setOtpModalOpen(false)} />
+        <TokenOTPmodal onClose={() => setOtpModalOpen(false)} email={emailId} />
       </Modal>
       {message && <p>{message}</p>}
       <div className="text-white py-2">
