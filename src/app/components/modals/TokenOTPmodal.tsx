@@ -2,24 +2,61 @@ import React, { useState } from "react";
 import Button from "../Button";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "../../providers/context";
+import { useAuthStore } from "@/app/store/authStore";
 
 interface TokenOTPmodalProps {
   onClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  email: string;
 }
 
-const TokenOTPmodal = ({ onClose }: TokenOTPmodalProps) => {
+const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
   const [token, setToken] = useState("");
+  const [message, setMessage] = useState("");
   const [isTokenValid, setIsTokenValid] = useState(false);
   const router = useRouter();
   const { basename } = useAppContext();
 
-  const handleTokenSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleTokenSubmit = async (e: React.FormEvent) => {
+    // e.preventDefault();
     // Handle token logic here
-    setIsTokenValid(true);
-    router.push(`${basename}`);
-    console.log("Token:", token);
+    // setIsTokenValid(true);
+    // router.push(`${basename}`);
+    // console.log("Token:", token);
     // Add logic to check if the token is valid
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:8080/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          emailId: email,
+          oneTimePassword: token,
+          context: "LOGIN",
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const { setToken, userRole } = useAuthStore.getState();
+        setToken(data.accessToken);
+        console.log("User Role:", userRole);
+        if (userRole === "Admin") {
+          router.push(`${basename}`);
+        } else {
+          setMessage("no admin");
+        }
+      } else {
+        const errorMessage = await response.text();
+        setMessage(`Login Failed: ${errorMessage}`);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setMessage(`An error has occured: ${error.message}`);
+      } else {
+        setMessage(`An unexpected error occured`);
+      }
+    }
   };
 
   return (
@@ -28,6 +65,7 @@ const TokenOTPmodal = ({ onClose }: TokenOTPmodalProps) => {
       <p className="text-sm text-gray-500">
         Voer de code in die je via je email hebt ontvangen om in te loggen.
       </p>
+      <p className="text-red-500">{message}</p>
       <input
         type="text"
         placeholder="Code"
