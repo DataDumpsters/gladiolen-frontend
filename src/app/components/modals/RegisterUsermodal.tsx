@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@/app/components/Button";
 import Inputfield from "@/app/components/Inputfield";
+import { useAuthStore } from "@/app/store/authStore";
 
 interface RegisterUsermodalProps {
   onClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -17,7 +18,8 @@ interface RegisterUsermodalProps {
     vatNumber: string;
     accountNumber: string;
     numberOfParkingTickets: number;
-  }[]; // Adjust the type based on your actual data structure
+  }[];
+  userId?: number;
 }
 
 const RegisterUsermodal = ({
@@ -27,6 +29,7 @@ const RegisterUsermodal = ({
   sexes,
   jobs,
   unions,
+  userId,
 }: RegisterUsermodalProps) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -43,6 +46,43 @@ const RegisterUsermodal = ({
   const [unionId, setUnionId] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [isUserMade, setIsUserMade] = useState(false);
+  const token = useAuthStore((state) => state.token);
+
+  useEffect(() => {
+    if (userId) {
+      // Fetch user data when userId is provided
+      const fetchUserData = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/api/user/${userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+          if (response.ok) {
+            const user = await response.json();
+            setFirstName(user.firstName);
+            setLastName(user.lastName);
+            setPhoneNumber(user.phoneNumber);
+            setEmail(user.email);
+            setRole(user.role);
+            setRegistryNumber(user.registryNumber);
+            setSize(user.tshirt?.size || "");
+            setSex(user.tshirt?.sex || "");
+            setJob(user.tshirt?.job || "");
+            setUnionId(user.union?.id.toString() || "");
+            setQuantity(user.tshirt?.quantity || 1);
+          }
+        } catch (error) {
+          console.error("Failed to fetch user data", error);
+        }
+      };
+
+      fetchUserData();
+    }
+  }, [userId, token]);
 
   const isPasswordValid = (password: string) => {
     return password.length >= 8 && /(?=.*[a-zA-Z])(?=.*\d)/.test(password);
@@ -128,35 +168,42 @@ const RegisterUsermodal = ({
     setErrors({});
     // Handle user registration logic here
     const registerUser = async () => {
+      const payload = {
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
+        role,
+        registryNumber,
+        password,
+        tshirt: {
+          size,
+          sex,
+          job,
+          quantity,
+        },
+        union: unions.find((u) => u.id === parseInt(unionId)),
+      };
+
+      console.log("Payload:", payload);
       try {
-        const response = await fetch("http://localhost:8080/api/user", {
+        const response = await fetch("http://localhost:8080/create-user", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            firstName,
-            lastName,
-            phoneNumber,
-            email,
-            role,
-            registryNumber,
-            password,
-            tshirt: {
-              size,
-              sex,
-              job,
-              quantity,
-            },
-            union: unions.find((u) => u.id === parseInt(unionId)),
-          }),
+          body: JSON.stringify(payload),
         });
+
         if (response.ok) {
           console.log("User registered successfully");
           setIsUserMade(true);
         } else {
           const errorMessage = await response.text();
-          console.error(`Registration Failed: ${errorMessage}`);
+          console.error(
+            `Registration Failed: ${errorMessage || response.statusText}`,
+          );
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -234,16 +281,12 @@ const RegisterUsermodal = ({
             ))}
           </select>
           {errors.role && <p className="text-red-500">{errors.role}</p>}
-          <input
-            type="text"
-            name="registryNumber"
-            placeholder="registernummer"
+          <Inputfield
+            name={"registryNumber"}
+            placeholder={"rijksregisternummer"}
             value={registryNumber}
-            onChange={(e) => {
-              setRegistryNumber(e.target.value);
-              validateField("registryNumber", e.target.value);
-            }}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5"
+            setValue={setRegistryNumber}
+            validateField={validateField}
           />
           {errors.registryNumber && (
             <p className="text-red-500">{errors.registryNumber}</p>
@@ -254,6 +297,7 @@ const RegisterUsermodal = ({
             value={password}
             setValue={setPassword}
             validateField={validateField}
+            type={"password"}
           />
           {errors.password && <p className="text-red-500">{errors.password}</p>}
           <Inputfield
@@ -262,6 +306,7 @@ const RegisterUsermodal = ({
             value={checkPassword}
             setValue={setCheckPassword}
             validateField={validateField}
+            type={"password"}
           />
           {errors.checkPassword && (
             <p className="text-red-500">{errors.checkPassword}</p>

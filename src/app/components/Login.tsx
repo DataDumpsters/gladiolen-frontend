@@ -6,7 +6,7 @@ import Link from "next/link";
 import Forgotpasswordmodal from "@/app/components/modals/Forgotpasswordmodal";
 import Modal from "@/app/components/Modal";
 import TokenOTPmodal from "@/app/components/modals/TokenOTPmodal";
-import RegisterUsermodal from "@/app/components/modals/RegisterUsermodal";
+import Inputfield from "@/app/components/Inputfield";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -16,34 +16,9 @@ const Login = () => {
   const [otpModalOpen, setOtpModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [roles, setRoles] = useState([]);
-  const [sizes, setSizes] = useState([]);
-  const [sexes, setSexes] = useState([]);
-  const [jobs, setJobs] = useState([]);
-  const [unions, setUnions] = useState([]);
 
   useEffect(() => {
     setIsClient(true);
-    // Fetch roles, sizes, sexes, and jobs
-    const fetchData = async () => {
-      const rolesResponse = await fetch("http://localhost:8080/api/user/roles");
-      const sizesResponse = await fetch(
-        "http://localhost:8080/api/tshirt/sizes",
-      );
-      const sexesResponse = await fetch(
-        "http://localhost:8080/api/tshirt/sexes",
-      );
-      const jobsResponse = await fetch("http://localhost:8080/api/tshirt/jobs");
-      const unionsResponse = await fetch("http://localhost:8080/api/union/all");
-
-      setRoles(await rolesResponse.json());
-      setSizes(await sizesResponse.json());
-      setSexes(await sexesResponse.json());
-      setJobs(await jobsResponse.json());
-      setUnions(await unionsResponse.json());
-    };
-
-    fetchData();
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -86,19 +61,19 @@ const Login = () => {
         <h1 className="text-3xl font-bold mb-4">
           Welkom bij GladiolenRegister!
         </h1>
-        <input
-          type="text"
-          placeholder="Email"
+        <Inputfield
+          name={"inputemail"}
+          placeholder={"Email"}
           value={emailId}
-          onChange={(e) => setEmailId(e.target.value)}
-          className="p-2 border border-gray-300 rounded-md mb-4"
+          setValue={setEmailId}
+          className="mb-4"
         />
-        <input
-          type="password"
-          placeholder="Paswoord"
+        <Inputfield
+          name={"password"}
+          placeholder={"Wachtwoord"}
+          type={"password"}
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="p-2 border border-gray-300 rounded-md mb-0"
+          setValue={setPassword}
         />
         <Link
           href={"#"}
@@ -117,22 +92,6 @@ const Login = () => {
         <TokenOTPmodal onClose={() => setOtpModalOpen(false)} email={emailId} />
       </Modal>
       {message && <p>{message}</p>}
-      <div className="text-white py-2">
-        Nog geen account? Registreer je{" "}
-        <Link href="#" onClick={() => setRegisterModalOpen(true)}>
-          <span className="font-bold underline">hier</span>.
-        </Link>
-      </div>
-      <Modal isOpen={registerModalOpen}>
-        <RegisterUsermodal
-          onClose={() => setRegisterModalOpen(false)}
-          roles={roles}
-          sizes={sizes}
-          sexes={sexes}
-          jobs={jobs}
-          unions={unions}
-        />
-      </Modal>
     </div>
   );
 };

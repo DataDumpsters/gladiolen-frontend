@@ -17,11 +17,6 @@ const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
   const { basename } = useAppContext();
 
   const handleTokenSubmit = async (e: React.FormEvent) => {
-    // e.preventDefault();
-    // Handle token logic here
-    // setIsTokenValid(true);
-    // router.push(`${basename}`);
-    // console.log("Token:", token);
     // Add logic to check if the token is valid
     e.preventDefault();
     try {
@@ -40,12 +35,18 @@ const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
         const data = await response.json();
         const { setToken, userRole } = useAuthStore.getState();
         setToken(data.accessToken);
+        console.log("Token set successfully:", data.accessToken);
+        setIsTokenValid(true);
         console.log("User Role:", userRole);
-        if (userRole === "Admin") {
-          router.push(`${basename}`);
-        } else {
-          setMessage("no admin");
-        }
+        setTimeout(() => {
+          const { userRole } = useAuthStore.getState();
+          console.log("User Role:", userRole);
+          if (userRole === "Admin") {
+            router.push(`${basename}`);
+          } else {
+            setMessage("no admin");
+          }
+        }, 0);
       } else {
         const errorMessage = await response.text();
         setMessage(`Login Failed: ${errorMessage}`);
@@ -85,12 +86,12 @@ const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
             className="bg-red-500 text-white"
             type="button"
             onClick={onClose}>
-            {isTokenValid ? "Close" : "Annuleren"}
+            Annuleren
           </Button>
         </div>
         {isTokenValid && (
           <div className="flex justify-end text-2xl text-green-400">
-            <p>&#x2714; Token valid</p>
+            <p>&#x2714;</p>
           </div>
         )}
       </div>
