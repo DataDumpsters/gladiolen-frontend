@@ -3,26 +3,17 @@ import Button from "@/app/components/Button";
 import Inputfield from "@/app/components/Inputfield";
 import { useAuthStore } from "@/app/store/authStore";
 
-interface RegisterUsermodalProps {
+interface UsermodalProps {
   onClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
   roles: string[];
   sizes: string[];
   sexes: string[];
   jobs: string[];
-  unions: {
-    id: number;
-    name: string;
-    address: string;
-    postalCode: number;
-    municipality: string;
-    vatNumber: string;
-    accountNumber: string;
-    numberOfParkingTickets: number;
-  }[];
+  unions: Union[];
   userId?: number;
 }
 
-const RegisterUsermodal = ({
+const Usermodal = ({
   onClose,
   roles,
   sizes,
@@ -30,7 +21,7 @@ const RegisterUsermodal = ({
   jobs,
   unions,
   userId,
-}: RegisterUsermodalProps) => {
+}: UsermodalProps) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -400,4 +391,4 @@ const RegisterUsermodal = ({
   );
 };
 
-export default RegisterUsermodal;
+export default Usermodal;

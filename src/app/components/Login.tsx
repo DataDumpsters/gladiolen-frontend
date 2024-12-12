@@ -14,7 +14,6 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [otpModalOpen, setOtpModalOpen] = useState(false);
-  const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
