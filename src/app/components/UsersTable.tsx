@@ -47,72 +47,69 @@ const UsersTable = ({ roles, sizes, sexes, jobs, unions }: UserTableProps) => {
   ];
 
   return (
-    console.log("Users", users),
-    (
-      <div>
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr>
-              {headers.map((header) => (
-                <th key={header} className="py-2 px-4 border-b border-gray-200">
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.firstName}</td>
-                <td>{user.lastName}</td>
-                <td>{user.union?.name || "Geen vereniging toegewezen"}</td>
-                <td>{user.tshirt?.size}</td>
-                <td>{user.tshirt?.sex}</td>
-                <td>{user.tshirt?.job}</td>
-                <td>{user.tshirt?.quantity}</td>
-                <td>
-                  {user.role !== "Admin" && (
-                    <TrashIcon
-                      className="h-6 w-6"
-                      onClick={() => {
-                        setSelectedUserId(user.id);
-                        setIsDeleteModalOpen(true);
-                      }}
-                    />
-                  )}
-                </td>
-                <td>
-                  <PencilIcon
+    <div>
+      <table className="min-w-full bg-white">
+        <thead>
+          <tr>
+            {headers.map((header) => (
+              <th key={header} className="py-2 px-4 border-b border-gray-200">
+                {header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>{user.firstName}</td>
+              <td>{user.lastName}</td>
+              <td>{user.union?.name || "Geen vereniging toegewezen"}</td>
+              <td>{user.tshirt?.size}</td>
+              <td>{user.tshirt?.sex}</td>
+              <td>{user.tshirt?.job}</td>
+              <td>{user.tshirt?.quantity}</td>
+              <td>
+                {user.role !== "Admin" && (
+                  <TrashIcon
                     className="h-6 w-6"
                     onClick={() => {
                       setSelectedUserId(user.id);
-                      setIsUsermodalOpen(true);
+                      setIsDeleteModalOpen(true);
                     }}
                   />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <Modal isOpen={isDeleteModalOpen}>
-          <Confirmdeletemodal
-            onClose={() => setIsDeleteModalOpen(false)}
-            userId={selectedUserId}
-          />
-        </Modal>
-        <Modal isOpen={isUsermodalOpen}>
-          <Usermodal
-            onClose={() => setIsUsermodalOpen(false)}
-            unions={unions}
-            sizes={sizes}
-            jobs={jobs}
-            sexes={sexes}
-            roles={roles}
-            userId={selectedUserId}
-          />
-        </Modal>
-      </div>
-    )
+                )}
+              </td>
+              <td>
+                <PencilIcon
+                  className="h-6 w-6"
+                  onClick={() => {
+                    setSelectedUserId(user.id);
+                    setIsUsermodalOpen(true);
+                  }}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <Modal isOpen={isDeleteModalOpen}>
+        <Confirmdeletemodal
+          onClose={() => setIsDeleteModalOpen(false)}
+          userId={selectedUserId}
+        />
+      </Modal>
+      <Modal isOpen={isUsermodalOpen}>
+        <Usermodal
+          onClose={() => setIsUsermodalOpen(false)}
+          unions={unions}
+          sizes={sizes}
+          jobs={jobs}
+          sexes={sexes}
+          roles={roles}
+          userId={selectedUserId}
+        />
+      </Modal>
+    </div>
   );
 };
 

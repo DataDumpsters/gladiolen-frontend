@@ -3,9 +3,10 @@ import Button from "@/app/components/Button";
 import Inputfield from "@/app/components/Inputfield";
 import { useAuthStore } from "@/app/store/authStore";
 import { useUserStore } from "@/app/store/userStore";
+import Dropdown from "@/app/components/Dropdown";
 
 interface UsermodalProps {
-  onClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onClose: () => void;
   roles: Role[];
   sizes: Size[];
   sexes: Sex[];
@@ -39,7 +40,7 @@ const Usermodal = ({
   const [quantity, setQuantity] = useState(1);
   const [isUserMade, setIsUserMade] = useState(false);
   const token = useAuthStore((state) => state.token);
-  const addUser = useUserStore((state) => state.addUser);
+  const fetchUsers = useUserStore((state) => state.fetchUsers);
 
   useEffect(() => {
     if (userId) {
@@ -143,7 +144,7 @@ const Usermodal = ({
     }
   };
 
-  const handleUserRegistration = (e: React.FormEvent) => {
+  const handleUser = (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = Object.keys(errors).reduce(
       (acc, key) => {
@@ -193,9 +194,14 @@ const Usermodal = ({
         });
 
         if (response.ok) {
-          const createdUser = await response.json();
-          addUser(createdUser);
           setIsUserMade(true);
+          // const user = await response.json();
+          // console.log("User created/updated: ", user);
+          // {
+          //   userId ? updateUser(user) : addUser(user);
+          // }
+          await fetchUsers(token);
+          onClose();
         } else {
           const errorMessage = await response.text();
           console.error(
@@ -210,19 +216,22 @@ const Usermodal = ({
         }
       }
     };
-
     registerUser();
   };
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Gebruiker aanmaken</h1>
+      <h1 className="text-2xl font-bold">
+        {userId ? "Medewerker bewerken" : "Medewerker aanmaken"}
+      </h1>
       <p className="text-sm text-gray-500">
-        Vul onderstaande velden in om een nieuwe medewerker aan te maken.
+        {userId
+          ? "Vul onderstaande velden in om de medewerker te bewerken."
+          : "Vul onderstaande velden in om een nieuwe gebruiker aan te maken."}
       </p>
       <div className="flex flex-row gap-2">
         <div className="flex flex-col gap-1">
-          <h3 className="text-xl font-bold">Gebruiker Details</h3>
+          <h3 className="text-xl font-bold">Details medewerker</h3>
           <Inputfield
             name="firstName"
             placeholder="voornaam"
@@ -311,54 +320,42 @@ const Usermodal = ({
         </div>
         <div className="flex flex-col">
           <h3 className="text-xl font-bold">Tshirt Details</h3>
-          <select
-            name="size"
+          <Dropdown
+            name={"size"}
+            title={"maat"}
+            items={sizes}
             value={size}
-            onChange={(e) => setSize(e.target.value)}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5">
-            <option value="">Selecteer een maat</option>
-            {sizes.map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
-          <select
-            name="sex"
+            setValue={setSize}
+          />
+          <Dropdown
+            name={"sex"}
+            title={"geslacht"}
+            items={sexes}
             value={sex}
-            onChange={(e) => setSex(e.target.value)}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5">
-            <option value="">Selecteer geslacht</option>
-            {sexes.map((sex) => (
-              <option key={sex} value={sex}>
-                {sex}
-              </option>
-            ))}
-          </select>
-          <select
-            name="job"
+            setValue={setSex}
+          />
+          <Dropdown
+            name={"job"}
+            title={"job"}
+            items={jobs}
             value={job}
-            onChange={(e) => setJob(e.target.value)}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5">
-            <option value="">Selecteer een job</option>
-            {jobs.map((job) => (
-              <option key={job} value={job}>
-                {job}
-              </option>
-            ))}
-          </select>
-          <select
+            setValue={setJob}
+          />
+          <Dropdown
             name="union"
-            value={unionId}
-            onChange={(e) => setUnionId(e.target.value)}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5">
-            <option value="">Selecteer een vereniging</option>
-            {unions.map((union) => (
-              <option key={union.id} value={union.id.toString()}>
-                {union.name}
-              </option>
-            ))}
-          </select>
+            title="vereniging"
+            items={unions.map((union) => union.name)}
+            value={
+              unions.find((union) => union.id.toString() === unionId)?.name ||
+              ""
+            }
+            setValue={(value) => {
+              const selectedUnion = unions.find(
+                (union) => union.name === value,
+              );
+              setUnionId(selectedUnion ? selectedUnion.id.toString() : "");
+            }}
+          />
           <div className="flex items-center">
             <label className="mr-2">Vrijdag & zaterdag?</label>
             <input
@@ -377,8 +374,8 @@ const Usermodal = ({
           <Button
             className="bg-gladiolentext text-white mr-1"
             type="button"
-            onClick={handleUserRegistration}>
-            Aanmaken
+            onClick={handleUser}>
+            {userId ? "Bewerken" : "Aanmaken"}
           </Button>
           <Button
             className="bg-red-500 text-white"
@@ -389,7 +386,11 @@ const Usermodal = ({
         </div>
         {isUserMade && (
           <div className="flex justify-end text-2xl text-green-400">
-            <p>&#x2714; Gebruiker aangemaakt</p>
+            {userId ? (
+              <p>&#x2714; Gebruiker bewerkt</p>
+            ) : (
+              <p>&#x2714; Gebruiker aangemaakt</p>
+            )}
           </div>
         )}
       </div>
