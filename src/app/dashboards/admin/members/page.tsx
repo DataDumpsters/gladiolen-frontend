@@ -6,15 +6,31 @@ import Usermodal from "@/app/components/modals/Usermodal";
 import Button from "@/app/components/Button";
 import useFetchData from "@/app/hooks/useFetchData";
 import UsersTable from "@/app/components/UsersTable";
+import { useUserStore } from "@/app/store/userStore";
+import { useAuthStore } from "@/app/store/authStore";
 
 const AdminMembersPage = () => {
   const [isClient, setIsClient] = useState(false);
-  const { roles, sizes, sexes, jobs, unions, users } = useFetchData();
+  const token = useAuthStore((state) => state.token);
+  const {
+    roles,
+    sizes,
+    sexes,
+    jobs,
+    unions,
+    users: initialUsers,
+  } = useFetchData();
+  const setUsers = useUserStore((state) => state.setUsers);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    setUsers(initialUsers);
+    console.log("Token", token);
+  }, [initialUsers, setUsers]);
 
   if (!isClient) {
     return null;
@@ -38,7 +54,6 @@ const AdminMembersPage = () => {
         />
       </Modal>
       <UsersTable
-        users={users}
         sexes={sexes}
         jobs={jobs}
         sizes={sizes}

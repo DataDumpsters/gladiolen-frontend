@@ -2,6 +2,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import React from "react";
 import { AppProvider } from "@/app/providers/context";
+import { AuthProvider } from "@/app/providers/AuthProvider";
 
 // Load Google Font
 const inter = Inter({ subsets: ["latin"] });
@@ -16,17 +17,19 @@ const RootLayout = ({ children }: RootLayoutProps) => {
       <body
         className={`${inter.className} flex flex-col min-h-screen bg-gladiolenbg`}>
         <AppProvider>
-          <header className="header flex-none">
-            {/*<div className="container mx-auto text-center">*/}
-            {/*    <h1>Gladiolen</h1>*/}
-            {/*</div>*/}
-          </header>
-          <main className="flex-grow flex items-center justify-center">
-            {children}
-          </main>
-          <footer className="footer flex-none w-full text-right pr-2">
-            <p>&copy; 2024 GladiolenRegister - Data Dumpsters</p>
-          </footer>
+          <AuthProvider>
+            <header className="header flex-none">
+              {/*<div className="container mx-auto text-center">*/}
+              {/*    <h1>Gladiolen</h1>*/}
+              {/*</div>*/}
+            </header>
+            <main className="flex-grow flex items-center justify-center">
+              {children}
+            </main>
+            <footer className="footer flex-none w-full text-right pr-2">
+              <p>&copy; 2024 GladiolenRegister - Data Dumpsters</p>
+            </footer>
+          </AuthProvider>
         </AppProvider>
       </body>
     </html>

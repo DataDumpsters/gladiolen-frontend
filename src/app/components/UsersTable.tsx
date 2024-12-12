@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import Modal from "@/app/components/Modal";
 import Confirmdeletemodal from "@/app/components/modals/Confirmdeletemodal";
 import Usermodal from "@/app/components/modals/Usermodal";
+import { useUserStore } from "@/app/store/userStore";
 
 interface UserTableProps {
-  users: User[];
   roles: Role[];
   sizes: Size[];
   sexes: Sex[];
@@ -14,18 +14,20 @@ interface UserTableProps {
   unions: Union[];
 }
 
-const UsersTable = ({
-  users,
-  roles,
-  sizes,
-  sexes,
-  jobs,
-  unions,
-}: UserTableProps) => {
-  const token = useAuthStore((state) => state.token);
+const UsersTable = ({ roles, sizes, sexes, jobs, unions }: UserTableProps) => {
+  const users = useUserStore((state) => state.users);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUsermodalOpen, setIsUsermodalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(0);
+  const { isHydrated } = useAuthStore();
+
+  if (!isHydrated) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+      </div>
+    );
+  }
 
   if (users.length === 0) {
     return <p>No members available.</p>;
@@ -45,64 +47,72 @@ const UsersTable = ({
   ];
 
   return (
-    <div>
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            {headers.map((header) => (
-              <th key={header} className="py-2 px-4 border-b border-gray-200">
-                {header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.firstName}</td>
-              <td>{user.lastName}</td>
-              <td>{user.union?.name || "Geen vereniging toegewezen"}</td>
-              <td>{user.tshirt?.size}</td>
-              <td>{user.tshirt?.sex}</td>
-              <td>{user.tshirt?.job}</td>
-              <td>{user.tshirt?.quantity}</td>
-              <td>
-                <TrashIcon
-                  className="h-6 w-6"
-                  onClick={() => {
-                    setSelectedUserId(user.id);
-                    setIsDeleteModalOpen(true);
-                  }}
-                />
-              </td>
-              <td>
-                <PencilIcon
-                  className="h-6 w-6"
-                  onClick={() => setIsUsermodalOpen(true)}
-                />
-              </td>
+    console.log("Users", users),
+    (
+      <div>
+        <table className="min-w-full bg-white">
+          <thead>
+            <tr>
+              {headers.map((header) => (
+                <th key={header} className="py-2 px-4 border-b border-gray-200">
+                  {header}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <Modal isOpen={isDeleteModalOpen}>
-        <Confirmdeletemodal
-          onClose={() => setIsDeleteModalOpen(false)}
-          userId={selectedUserId}
-        />
-      </Modal>
-      <Modal isOpen={isUsermodalOpen}>
-        <Usermodal
-          onClose={() => setIsUsermodalOpen(false)}
-          unions={unions}
-          sizes={sizes}
-          jobs={jobs}
-          sexes={sexes}
-          roles={roles}
-          userId={selectedUserId}
-        />
-      </Modal>
-    </div>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td>{user.firstName}</td>
+                <td>{user.lastName}</td>
+                <td>{user.union?.name || "Geen vereniging toegewezen"}</td>
+                <td>{user.tshirt?.size}</td>
+                <td>{user.tshirt?.sex}</td>
+                <td>{user.tshirt?.job}</td>
+                <td>{user.tshirt?.quantity}</td>
+                <td>
+                  {user.role !== "Admin" && (
+                    <TrashIcon
+                      className="h-6 w-6"
+                      onClick={() => {
+                        setSelectedUserId(user.id);
+                        setIsDeleteModalOpen(true);
+                      }}
+                    />
+                  )}
+                </td>
+                <td>
+                  <PencilIcon
+                    className="h-6 w-6"
+                    onClick={() => {
+                      setSelectedUserId(user.id);
+                      setIsUsermodalOpen(true);
+                    }}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <Modal isOpen={isDeleteModalOpen}>
+          <Confirmdeletemodal
+            onClose={() => setIsDeleteModalOpen(false)}
+            userId={selectedUserId}
+          />
+        </Modal>
+        <Modal isOpen={isUsermodalOpen}>
+          <Usermodal
+            onClose={() => setIsUsermodalOpen(false)}
+            unions={unions}
+            sizes={sizes}
+            jobs={jobs}
+            sexes={sexes}
+            roles={roles}
+            userId={selectedUserId}
+          />
+        </Modal>
+      </div>
+    )
   );
 };
 

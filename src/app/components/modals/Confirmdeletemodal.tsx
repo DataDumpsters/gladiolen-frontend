@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import Button from "@/app/components/Button";
 import { useAuthStore } from "@/app/store/authStore";
+import { useUserStore } from "@/app/store/userStore";
 
 interface ConfirmdeletemodalProps {
   onClose: () => void;
@@ -9,6 +10,7 @@ interface ConfirmdeletemodalProps {
 
 const Confirmdeletemodal = ({ onClose, userId }: ConfirmdeletemodalProps) => {
   const token = useAuthStore((state) => state.token);
+  const removeUser = useUserStore((state) => state.removeUser);
 
   const handleDelete = async (id: number) => {
     try {
@@ -20,7 +22,7 @@ const Confirmdeletemodal = ({ onClose, userId }: ConfirmdeletemodalProps) => {
         },
       });
       if (response.ok) {
-        console.log(`User with id ${id} has been deleted`);
+        removeUser(id);
         onClose();
       }
     } catch (error) {

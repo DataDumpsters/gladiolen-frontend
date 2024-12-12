@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import Button from "@/app/components/Button";
 import Inputfield from "@/app/components/Inputfield";
 import { useAuthStore } from "@/app/store/authStore";
+import { useUserStore } from "@/app/store/userStore";
 
 interface UsermodalProps {
   onClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  roles: string[];
-  sizes: string[];
-  sexes: string[];
-  jobs: string[];
+  roles: Role[];
+  sizes: Size[];
+  sexes: Sex[];
+  jobs: Job[];
   unions: Union[];
   userId?: number;
 }
@@ -38,20 +39,18 @@ const Usermodal = ({
   const [quantity, setQuantity] = useState(1);
   const [isUserMade, setIsUserMade] = useState(false);
   const token = useAuthStore((state) => state.token);
+  const addUser = useUserStore((state) => state.addUser);
 
   useEffect(() => {
     if (userId) {
       // Fetch user data when userId is provided
       const fetchUserData = async () => {
         try {
-          const response = await fetch(
-            `http://localhost:8080/api/user/${userId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+          const response = await fetch(`http://localhost:8080/user/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
             },
-          );
+          });
           if (response.ok) {
             const user = await response.json();
             setFirstName(user.firstName);
@@ -60,11 +59,16 @@ const Usermodal = ({
             setEmail(user.email);
             setRole(user.role);
             setRegistryNumber(user.registryNumber);
+            setPassword(user.password); // Clear password fields for security
+            setCheckPassword(user.password);
             setSize(user.tshirt?.size || "");
             setSex(user.tshirt?.sex || "");
             setJob(user.tshirt?.job || "");
             setUnionId(user.union?.id.toString() || "");
             setQuantity(user.tshirt?.quantity || 1);
+            console.log("User data fetched: ", user);
+          } else {
+            console.error("Failed to fetch user data: ", response.statusText);
           }
         } catch (error) {
           console.error("Failed to fetch user data", error);
@@ -78,10 +82,6 @@ const Usermodal = ({
   const isPasswordValid = (password: string) => {
     return password.length >= 8 && /(?=.*[a-zA-Z])(?=.*\d)/.test(password);
   };
-  const passwordsMatch =
-    isPasswordValid(password) &&
-    isPasswordValid(checkPassword) &&
-    password === checkPassword;
 
   const validateField = (name: string, value: string) => {
     let error = "";
@@ -125,7 +125,7 @@ const Usermodal = ({
   const checkEmailExists = async (email: string) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/user/check-email?email=${email}`,
+        `http://localhost:8080/user/check-email?email=${email}`,
       );
       if (response.ok) {
         const exists = await response.json();
@@ -173,13 +173,18 @@ const Usermodal = ({
           job,
           quantity,
         },
-        union: unions.find((u) => u.id === parseInt(unionId)),
+        union: unions.find((u) => u.id === Number(unionId)),
       };
 
       console.log("Payload:", payload);
       try {
-        const response = await fetch("http://localhost:8080/create-user", {
-          method: "POST",
+        const url = userId
+          ? `http://localhost:8080/admin/user/${userId}`
+          : "http://localhost:8080/create-user";
+        const method = userId ? "PUT" : "POST";
+
+        const response = await fetch(url, {
+          method: method,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -188,7 +193,8 @@ const Usermodal = ({
         });
 
         if (response.ok) {
-          console.log("User registered successfully");
+          const createdUser = await response.json();
+          addUser(createdUser);
           setIsUserMade(true);
         } else {
           const errorMessage = await response.text();
@@ -348,7 +354,7 @@ const Usermodal = ({
             className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5">
             <option value="">Selecteer een vereniging</option>
             {unions.map((union) => (
-              <option key={union.id} value={union.id}>
+              <option key={union.id} value={union.id.toString()}>
                 {union.name}
               </option>
             ))}

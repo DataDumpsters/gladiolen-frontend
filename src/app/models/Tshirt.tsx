@@ -4,5 +4,5 @@ interface Tshirt {
   sex: Sex;
   job: Job;
   quantity: number;
-  User?: User;
+  user?: User;
 }

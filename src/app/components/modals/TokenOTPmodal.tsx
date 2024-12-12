@@ -3,6 +3,7 @@ import Button from "../Button";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "../../providers/context";
 import { useAuthStore } from "@/app/store/authStore";
+import { jwtDecode } from "jwt-decode";
 
 interface TokenOTPmodalProps {
   onClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -10,15 +11,18 @@ interface TokenOTPmodalProps {
 }
 
 const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
-  const [token, setToken] = useState("");
+  const [token, setTokenInput] = useState("");
   const [message, setMessage] = useState("");
   const [isTokenValid, setIsTokenValid] = useState(false);
   const router = useRouter();
   const { basename } = useAppContext();
 
+  // Zustand actions
+  const setAuthToken = useAuthStore((state) => state.setToken);
+
   const handleTokenSubmit = async (e: React.FormEvent) => {
-    // Add logic to check if the token is valid
     e.preventDefault();
+
     try {
       const response = await fetch("http://localhost:8080/verify-otp", {
         method: "POST",
@@ -31,31 +35,37 @@ const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
           context: "LOGIN",
         }),
       });
+
       if (response.ok) {
         const data = await response.json();
-        const { setToken, userRole } = useAuthStore.getState();
-        setToken(data.accessToken);
+
+        // Call Zustand's setToken to persist the token
+        setAuthToken(data.accessToken);
         console.log("Token set successfully:", data.accessToken);
+
         setIsTokenValid(true);
-        console.log("User Role:", userRole);
-        setTimeout(() => {
-          const { userRole } = useAuthStore.getState();
-          console.log("User Role:", userRole);
-          if (userRole === "Admin") {
-            router.push(`${basename}`);
-          } else {
-            setMessage("no admin");
-          }
-        }, 0);
+
+        // Decode the token to extract user role
+        const decodedToken = jwtDecode<{ role: string }>(data.accessToken);
+        const userRole = decodedToken.role;
+
+        console.log("Decoded User Role:", userRole);
+
+        // Navigate based on the user role
+        if (userRole === "Admin") {
+          router.push(`${basename}`);
+        } else {
+          setMessage("No admin privileges");
+        }
       } else {
         const errorMessage = await response.text();
         setMessage(`Login Failed: ${errorMessage}`);
       }
     } catch (error) {
       if (error instanceof Error) {
-        setMessage(`An error has occured: ${error.message}`);
+        setMessage(`An error has occurred: ${error.message}`);
       } else {
-        setMessage(`An unexpected error occured`);
+        setMessage("An unexpected error occurred");
       }
     }
   };
@@ -71,7 +81,7 @@ const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
         type="text"
         placeholder="Code"
         value={token}
-        onChange={(e) => setToken(e.target.value)}
+        onChange={(e) => setTokenInput(e.target.value)}
         className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5"
       />
       <div className="flex flex-row items-baseline justify-between">
