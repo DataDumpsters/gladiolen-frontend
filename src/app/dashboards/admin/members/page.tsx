@@ -11,7 +11,7 @@ import { useAuthStore } from "@/app/store/authStore";
 
 const AdminMembersPage = () => {
   const [isClient, setIsClient] = useState(false);
-  const token = useAuthStore((state) => state.token);
+  const { token, isHydrated } = useAuthStore();
   const {
     roles,
     sizes,
@@ -29,11 +29,15 @@ const AdminMembersPage = () => {
 
   useEffect(() => {
     setUsers(initialUsers);
-    console.log("Token", token);
+    console.log("Check members page token", token);
   }, [initialUsers, setUsers]);
 
   if (!isClient) {
     return null;
+  }
+
+  if (!isHydrated) {
+    return <div>Loading...</div>; // Optionally show a loading indicator
   }
 
   return (

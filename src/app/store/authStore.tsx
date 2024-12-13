@@ -16,12 +16,14 @@ export const useAuthStore = create<AuthState>()(
       userRole: null,
       isHydrated: false,
       setToken: (token: string) => {
+        if (!token) return; // Ensure the token is not null or undefined
+
         try {
           const decodedToken = jwtDecode<{ role: string }>(token);
-          set({ token, userRole: decodedToken.role, isHydrated: true });
-          console.log("Token set successfully:", {
-            token,
+          set({
+            token, // Save the raw token, do not manipulate or stringify
             userRole: decodedToken.role,
+            isHydrated: true,
           });
         } catch (error) {
           console.error("Failed to decode token:", error);
@@ -29,36 +31,8 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: "auth-storage",
-      storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state, error) => {
-        if (error) {
-          console.error("Hydration failed:", error);
-          return;
-        }
-        if (state) {
-          const token = state.token;
-          if (token) {
-            try {
-              const decodedToken = jwtDecode<{ role: string }>(token);
-              useAuthStore.setState({
-                token,
-                userRole: decodedToken.role,
-                isHydrated: true,
-              });
-              console.log("Hydration complete:", {
-                token,
-                userRole: decodedToken.role,
-              });
-            } catch (error) {
-              console.error("Failed to decode token during hydration:", error);
-              useAuthStore.setState({ isHydrated: true });
-            }
-          } else {
-            useAuthStore.setState({ isHydrated: true });
-          }
-        }
-      },
+      name: "auth-storage", // Key used in localStorage
+      storage: createJSONStorage(() => localStorage), // Zustand handles serialization
     },
   ),
 );

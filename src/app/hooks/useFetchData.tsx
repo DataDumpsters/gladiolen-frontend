@@ -8,7 +8,7 @@ const useFetchData = () => {
   const [jobs, setJobs] = useState([]);
   const [unions, setUnions] = useState([]);
   const [users, setUsers] = useState([]);
-  const token = useAuthStore((state) => state.token);
+  const { token } = useAuthStore();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -16,6 +16,8 @@ const useFetchData = () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       };
+
+      console.log("Weeral checken", token);
 
       const fetchJson = async (url: string) => {
         const response = await fetch(url, { headers });
