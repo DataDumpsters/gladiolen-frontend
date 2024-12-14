@@ -4,6 +4,7 @@ import Inputfield from "@/app/components/Inputfield";
 import { useAuthStore } from "@/app/store/authStore";
 import { useUserStore } from "@/app/store/userStore";
 import Dropdown from "@/app/components/Dropdown";
+import FilteredDropdown from "@/app/components/FilteredDropdown";
 
 interface UsermodalProps {
   onClose: () => void;
@@ -79,10 +80,6 @@ const Usermodal = ({
       fetchUserData();
     }
   }, [userId, token]);
-
-  const isPasswordValid = (password: string) => {
-    return password.length >= 8 && /(?=.*[a-zA-Z])(?=.*\d)/.test(password);
-  };
 
   const validateField = (name: string, value: string) => {
     let error = "";
@@ -160,6 +157,7 @@ const Usermodal = ({
     setErrors({});
     // Handle user registration logic here
     const registerUser = async () => {
+      console.log("Union Id before payload:", unionId);
       const payload = {
         firstName,
         lastName,
@@ -177,6 +175,8 @@ const Usermodal = ({
         union: unions.find((u) => u.id === Number(unionId)),
       };
 
+      console.log("Union ID:", unionId); // Log the value of unionId
+      console.log("Unions array:", unions);
       console.log("Payload:", payload);
       try {
         const url = userId
@@ -195,11 +195,6 @@ const Usermodal = ({
 
         if (response.ok) {
           setIsUserMade(true);
-          // const user = await response.json();
-          // console.log("User created/updated: ", user);
-          // {
-          //   userId ? updateUser(user) : addUser(user);
-          // }
           await fetchUsers(token);
           onClose();
         } else {
@@ -233,8 +228,8 @@ const Usermodal = ({
         <div className="flex flex-col gap-1">
           <h3 className="text-xl font-bold">Details medewerker</h3>
           <Inputfield
-            name="firstName"
-            placeholder="voornaam"
+            name={"firstName"}
+            placeholder={"voornaam"}
             value={firstName}
             setValue={setFirstName}
             validateField={validateField}
@@ -243,16 +238,16 @@ const Usermodal = ({
             <p className="text-red-500">{errors.firstName}</p>
           )}
           <Inputfield
-            name="lastName"
-            placeholder="achternaam"
+            name={"lastName"}
+            placeholder={"achternaam"}
             value={lastName}
             setValue={setLastName}
             validateField={validateField}
           />
           {errors.lastName && <p className="text-red-500">{errors.lastName}</p>}
           <Inputfield
-            name="phoneNumber"
-            placeholder="telefoonnummer"
+            name={"phoneNumber"}
+            placeholder={"telefoonnummer"}
             value={phoneNumber}
             setValue={setPhoneNumber}
             validateField={validateField}
@@ -261,8 +256,8 @@ const Usermodal = ({
             <p className="text-red-500">{errors.phoneNumber}</p>
           )}
           <Inputfield
-            name="email"
-            placeholder="email"
+            name={"email"}
+            placeholder={"email"}
             value={email}
             setValue={setEmail}
             validateField={validateField}
@@ -272,7 +267,7 @@ const Usermodal = ({
         </div>
         <div className="flex flex-col">
           <select
-            name="role"
+            name={"role"}
             value={role}
             onChange={(e) => {
               setRole(e.target.value);
@@ -298,8 +293,8 @@ const Usermodal = ({
             <p className="text-red-500">{errors.registryNumber}</p>
           )}
           <Inputfield
-            name="password"
-            placeholder="wachtwoord"
+            name={"password"}
+            placeholder={"wachtwoord"}
             value={password}
             setValue={setPassword}
             validateField={validateField}
@@ -307,8 +302,8 @@ const Usermodal = ({
           />
           {errors.password && <p className="text-red-500">{errors.password}</p>}
           <Inputfield
-            name="checkPassword"
-            placeholder="check wachtwoord"
+            name={"checkPassword"}
+            placeholder={"check wachtwoord"}
             value={checkPassword}
             setValue={setCheckPassword}
             validateField={validateField}
@@ -341,26 +336,43 @@ const Usermodal = ({
             value={job}
             setValue={setJob}
           />
-          <Dropdown
-            name="union"
-            title="vereniging"
-            items={unions.map((union) => union.name)}
-            value={
-              unions.find((union) => union.id.toString() === unionId)?.name ||
-              ""
-            }
+          {/*<Dropdown*/}
+          {/*  name={"union"}*/}
+          {/*  title={"vereniging"}*/}
+          {/*  items={unions}*/}
+          {/*  value={unionId}*/}
+          {/*  setValue={(value) => {*/}
+          {/*    const selectedUnion = unions.find(*/}
+          {/*      (union) => union.id.toString() === value,*/}
+          {/*    );*/}
+          {/*    if (selectedUnion) {*/}
+          {/*      setUnionId(selectedUnion.id.toString()); // Make sure to set as string*/}
+          {/*    } else {*/}
+          {/*      setUnionId(""); // Handle the case when no value is selected*/}
+          {/*    }*/}
+          {/*  }}*/}
+          {/*/>*/}
+          <FilteredDropdown
+            name={"union"}
+            title={"vereniging"}
+            items={unions}
+            value={unionId}
             setValue={(value) => {
               const selectedUnion = unions.find(
-                (union) => union.name === value,
+                (union) => union.id.toString() === value,
               );
-              setUnionId(selectedUnion ? selectedUnion.id.toString() : "");
+              if (selectedUnion) {
+                setUnionId(selectedUnion.id.toString()); // Make sure to set as string
+              } else {
+                setUnionId(""); // Handle the case when no value is selected
+              }
             }}
           />
           <div className="flex items-center">
             <label className="mr-2">Vrijdag & zaterdag?</label>
             <input
               type="checkbox"
-              name="quantity"
+              name={"quantity"}
               checked={quantity === 2}
               value={quantity}
               onChange={(e) => setQuantity(e.target.checked ? 2 : 1)}

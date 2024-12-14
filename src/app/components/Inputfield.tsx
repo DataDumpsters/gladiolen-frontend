@@ -21,18 +21,19 @@ const Inputfield = ({
   className,
   type = "text",
 }: InputfieldProps) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+    if (validateField) {
+      validateField(name, e.target.value);
+    }
+  };
   return (
     <input
       type={type}
       name={name}
       placeholder={placeholder}
       value={value}
-      onChange={(e) => {
-        setValue(e.target.value);
-        if (validateField) {
-          validateField(name, e.target.value);
-        }
-      }}
+      onChange={handleChange}
       onBlur={onBlur}
       className={`rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5 ${className}`}
     />
