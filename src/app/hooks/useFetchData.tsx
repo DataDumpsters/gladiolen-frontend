@@ -7,7 +7,7 @@ const useFetchData = () => {
   const [sexes, setSexes] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [unions, setUnions] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
   const { token } = useAuthStore();
 
   useEffect(() => {
@@ -55,7 +55,7 @@ const useFetchData = () => {
       if (unionsData) setUnions(unionsData);
 
       if (usersData) {
-        const usersWithoutPassword = usersData.map((user: any) => {
+        const usersWithoutPassword = usersData.map((user: User) => {
           const { password, ...userWithoutPassword } = user;
           return userWithoutPassword;
         });

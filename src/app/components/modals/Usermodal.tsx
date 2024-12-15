@@ -336,22 +336,6 @@ const Usermodal = ({
             value={job}
             setValue={setJob}
           />
-          {/*<Dropdown*/}
-          {/*  name={"union"}*/}
-          {/*  title={"vereniging"}*/}
-          {/*  items={unions}*/}
-          {/*  value={unionId}*/}
-          {/*  setValue={(value) => {*/}
-          {/*    const selectedUnion = unions.find(*/}
-          {/*      (union) => union.id.toString() === value,*/}
-          {/*    );*/}
-          {/*    if (selectedUnion) {*/}
-          {/*      setUnionId(selectedUnion.id.toString()); // Make sure to set as string*/}
-          {/*    } else {*/}
-          {/*      setUnionId(""); // Handle the case when no value is selected*/}
-          {/*    }*/}
-          {/*  }}*/}
-          {/*/>*/}
           <FilteredDropdown
             name={"union"}
             title={"vereniging"}
