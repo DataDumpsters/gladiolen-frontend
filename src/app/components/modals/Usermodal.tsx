@@ -1,33 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@/app/components/Button";
 import Inputfield from "@/app/components/Inputfield";
+import { useAuthStore } from "@/app/store/authStore";
+import { useUserStore } from "@/app/store/userStore";
+import Dropdown from "@/app/components/Dropdown";
+import FilteredDropdown from "@/app/components/FilteredDropdown";
 
-interface RegisterUsermodalProps {
-  onClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  roles: string[];
-  sizes: string[];
-  sexes: string[];
-  jobs: string[];
-  unions: {
-    id: number;
-    name: string;
-    address: string;
-    postalCode: number;
-    municipality: string;
-    vatNumber: string;
-    accountNumber: string;
-    numberOfParkingTickets: number;
-  }[]; // Adjust the type based on your actual data structure
+interface UsermodalProps {
+  onClose: () => void;
+  roles: Role[];
+  sizes: Size[];
+  sexes: Sex[];
+  jobs: Job[];
+  unions: Union[];
+  userId?: number;
 }
 
-const RegisterUsermodal = ({
+const Usermodal = ({
   onClose,
   roles,
   sizes,
   sexes,
   jobs,
   unions,
-}: RegisterUsermodalProps) => {
+  userId,
+}: UsermodalProps) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -43,14 +40,46 @@ const RegisterUsermodal = ({
   const [unionId, setUnionId] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [isUserMade, setIsUserMade] = useState(false);
+  const token = useAuthStore((state) => state.token);
+  const fetchUsers = useUserStore((state) => state.fetchUsers);
 
-  const isPasswordValid = (password: string) => {
-    return password.length >= 8 && /(?=.*[a-zA-Z])(?=.*\d)/.test(password);
-  };
-  const passwordsMatch =
-    isPasswordValid(password) &&
-    isPasswordValid(checkPassword) &&
-    password === checkPassword;
+  useEffect(() => {
+    if (userId) {
+      // Fetch user data when userId is provided
+      const fetchUserData = async () => {
+        try {
+          const response = await fetch(`http://localhost:8080/user/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (response.ok) {
+            const user = await response.json();
+            setFirstName(user.firstName);
+            setLastName(user.lastName);
+            setPhoneNumber(user.phoneNumber);
+            setEmail(user.email);
+            setRole(user.role);
+            setRegistryNumber(user.registryNumber);
+            setPassword(user.password); // Clear password fields for security
+            setCheckPassword(user.password);
+            setSize(user.tshirt?.size || "");
+            setSex(user.tshirt?.sex || "");
+            setJob(user.tshirt?.job || "");
+            setUnionId(user.union?.id.toString() || "");
+            setQuantity(user.tshirt?.quantity || 1);
+            console.log("User data fetched: ", user);
+          } else {
+            console.error("Failed to fetch user data: ", response.statusText);
+          }
+        } catch (error) {
+          console.error("Failed to fetch user data", error);
+        }
+      };
+
+      fetchUserData();
+    }
+  }, [userId, token]);
 
   const validateField = (name: string, value: string) => {
     let error = "";
@@ -94,7 +123,7 @@ const RegisterUsermodal = ({
   const checkEmailExists = async (email: string) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/user/check-email?email=${email}`,
+        `http://localhost:8080/user/check-email?email=${email}`,
       );
       if (response.ok) {
         const exists = await response.json();
@@ -112,7 +141,7 @@ const RegisterUsermodal = ({
     }
   };
 
-  const handleUserRegistration = (e: React.FormEvent) => {
+  const handleUser = (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = Object.keys(errors).reduce(
       (acc, key) => {
@@ -128,35 +157,51 @@ const RegisterUsermodal = ({
     setErrors({});
     // Handle user registration logic here
     const registerUser = async () => {
+      console.log("Union Id before payload:", unionId);
+      const payload = {
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
+        role,
+        registryNumber,
+        password,
+        tshirt: {
+          size,
+          sex,
+          job,
+          quantity,
+        },
+        union: unions.find((u) => u.id === Number(unionId)),
+      };
+
+      console.log("Union ID:", unionId); // Log the value of unionId
+      console.log("Unions array:", unions);
+      console.log("Payload:", payload);
       try {
-        const response = await fetch("http://localhost:8080/api/user", {
-          method: "POST",
+        const url = userId
+          ? `http://localhost:8080/admin/user/${userId}`
+          : "http://localhost:8080/create-user";
+        const method = userId ? "PUT" : "POST";
+
+        const response = await fetch(url, {
+          method: method,
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            firstName,
-            lastName,
-            phoneNumber,
-            email,
-            role,
-            registryNumber,
-            password,
-            tshirt: {
-              size,
-              sex,
-              job,
-              quantity,
-            },
-            union: unions.find((u) => u.id === parseInt(unionId)),
-          }),
+          body: JSON.stringify(payload),
         });
+
         if (response.ok) {
-          console.log("User registered successfully");
           setIsUserMade(true);
+          await fetchUsers(token);
+          onClose();
         } else {
           const errorMessage = await response.text();
-          console.error(`Registration Failed: ${errorMessage}`);
+          console.error(
+            `Registration Failed: ${errorMessage || response.statusText}`,
+          );
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -166,22 +211,25 @@ const RegisterUsermodal = ({
         }
       }
     };
-
     registerUser();
   };
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Gebruiker aanmaken</h1>
+      <h1 className="text-2xl font-bold">
+        {userId ? "Medewerker bewerken" : "Medewerker aanmaken"}
+      </h1>
       <p className="text-sm text-gray-500">
-        Vul onderstaande velden in om een nieuwe medewerker aan te maken.
+        {userId
+          ? "Vul onderstaande velden in om de medewerker te bewerken."
+          : "Vul onderstaande velden in om een nieuwe gebruiker aan te maken."}
       </p>
       <div className="flex flex-row gap-2">
         <div className="flex flex-col gap-1">
-          <h3 className="text-xl font-bold">Gebruiker Details</h3>
+          <h3 className="text-xl font-bold">Details medewerker</h3>
           <Inputfield
-            name="firstName"
-            placeholder="voornaam"
+            name={"firstName"}
+            placeholder={"voornaam"}
             value={firstName}
             setValue={setFirstName}
             validateField={validateField}
@@ -190,16 +238,16 @@ const RegisterUsermodal = ({
             <p className="text-red-500">{errors.firstName}</p>
           )}
           <Inputfield
-            name="lastName"
-            placeholder="achternaam"
+            name={"lastName"}
+            placeholder={"achternaam"}
             value={lastName}
             setValue={setLastName}
             validateField={validateField}
           />
           {errors.lastName && <p className="text-red-500">{errors.lastName}</p>}
           <Inputfield
-            name="phoneNumber"
-            placeholder="telefoonnummer"
+            name={"phoneNumber"}
+            placeholder={"telefoonnummer"}
             value={phoneNumber}
             setValue={setPhoneNumber}
             validateField={validateField}
@@ -208,8 +256,8 @@ const RegisterUsermodal = ({
             <p className="text-red-500">{errors.phoneNumber}</p>
           )}
           <Inputfield
-            name="email"
-            placeholder="email"
+            name={"email"}
+            placeholder={"email"}
             value={email}
             setValue={setEmail}
             validateField={validateField}
@@ -219,7 +267,7 @@ const RegisterUsermodal = ({
         </div>
         <div className="flex flex-col">
           <select
-            name="role"
+            name={"role"}
             value={role}
             onChange={(e) => {
               setRole(e.target.value);
@@ -234,34 +282,32 @@ const RegisterUsermodal = ({
             ))}
           </select>
           {errors.role && <p className="text-red-500">{errors.role}</p>}
-          <input
-            type="text"
-            name="registryNumber"
-            placeholder="registernummer"
+          <Inputfield
+            name={"registryNumber"}
+            placeholder={"rijksregisternummer"}
             value={registryNumber}
-            onChange={(e) => {
-              setRegistryNumber(e.target.value);
-              validateField("registryNumber", e.target.value);
-            }}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5"
+            setValue={setRegistryNumber}
+            validateField={validateField}
           />
           {errors.registryNumber && (
             <p className="text-red-500">{errors.registryNumber}</p>
           )}
           <Inputfield
-            name="password"
-            placeholder="wachtwoord"
+            name={"password"}
+            placeholder={"wachtwoord"}
             value={password}
             setValue={setPassword}
             validateField={validateField}
+            type={"password"}
           />
           {errors.password && <p className="text-red-500">{errors.password}</p>}
           <Inputfield
-            name="checkPassword"
-            placeholder="check wachtwoord"
+            name={"checkPassword"}
+            placeholder={"check wachtwoord"}
             value={checkPassword}
             setValue={setCheckPassword}
             validateField={validateField}
+            type={"password"}
           />
           {errors.checkPassword && (
             <p className="text-red-500">{errors.checkPassword}</p>
@@ -269,59 +315,48 @@ const RegisterUsermodal = ({
         </div>
         <div className="flex flex-col">
           <h3 className="text-xl font-bold">Tshirt Details</h3>
-          <select
-            name="size"
+          <Dropdown
+            name={"size"}
+            title={"maat"}
+            items={sizes}
             value={size}
-            onChange={(e) => setSize(e.target.value)}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5">
-            <option value="">Selecteer een maat</option>
-            {sizes.map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
-          <select
-            name="sex"
+            setValue={setSize}
+          />
+          <Dropdown
+            name={"sex"}
+            title={"geslacht"}
+            items={sexes}
             value={sex}
-            onChange={(e) => setSex(e.target.value)}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5">
-            <option value="">Selecteer geslacht</option>
-            {sexes.map((sex) => (
-              <option key={sex} value={sex}>
-                {sex}
-              </option>
-            ))}
-          </select>
-          <select
-            name="job"
+            setValue={setSex}
+          />
+          <Dropdown
+            name={"job"}
+            title={"job"}
+            items={jobs}
             value={job}
-            onChange={(e) => setJob(e.target.value)}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5">
-            <option value="">Selecteer een job</option>
-            {jobs.map((job) => (
-              <option key={job} value={job}>
-                {job}
-              </option>
-            ))}
-          </select>
-          <select
-            name="union"
+            setValue={setJob}
+          />
+          <FilteredDropdown
+            name={"union"}
+            title={"vereniging"}
+            items={unions}
             value={unionId}
-            onChange={(e) => setUnionId(e.target.value)}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5">
-            <option value="">Selecteer een vereniging</option>
-            {unions.map((union) => (
-              <option key={union.id} value={union.id}>
-                {union.name}
-              </option>
-            ))}
-          </select>
+            setValue={(value) => {
+              const selectedUnion = unions.find(
+                (union) => union.id.toString() === value,
+              );
+              if (selectedUnion) {
+                setUnionId(selectedUnion.id.toString()); // Make sure to set as string
+              } else {
+                setUnionId(""); // Handle the case when no value is selected
+              }
+            }}
+          />
           <div className="flex items-center">
             <label className="mr-2">Vrijdag & zaterdag?</label>
             <input
               type="checkbox"
-              name="quantity"
+              name={"quantity"}
               checked={quantity === 2}
               value={quantity}
               onChange={(e) => setQuantity(e.target.checked ? 2 : 1)}
@@ -335,8 +370,8 @@ const RegisterUsermodal = ({
           <Button
             className="bg-gladiolentext text-white mr-1"
             type="button"
-            onClick={handleUserRegistration}>
-            Aanmaken
+            onClick={handleUser}>
+            {userId ? "Bewerken" : "Aanmaken"}
           </Button>
           <Button
             className="bg-red-500 text-white"
@@ -347,7 +382,11 @@ const RegisterUsermodal = ({
         </div>
         {isUserMade && (
           <div className="flex justify-end text-2xl text-green-400">
-            <p>&#x2714; Gebruiker aangemaakt</p>
+            {userId ? (
+              <p>&#x2714; Gebruiker bewerkt</p>
+            ) : (
+              <p>&#x2714; Gebruiker aangemaakt</p>
+            )}
           </div>
         )}
       </div>
@@ -355,4 +394,4 @@ const RegisterUsermodal = ({
   );
 };
 
-export default RegisterUsermodal;
+export default Usermodal;

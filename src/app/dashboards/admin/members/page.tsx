@@ -2,114 +2,79 @@
 
 import React, { useEffect, useState } from "react";
 import Modal from "@/app/components/Modal";
-import RegisterUsermodal from "@/app/components/modals/RegisterUsermodal";
-import Link from "next/link";
+import Usermodal from "@/app/components/modals/Usermodal";
 import Button from "@/app/components/Button";
 import useFetchData from "@/app/hooks/useFetchData";
-
-interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  email: string;
-  role: string;
-  registryNumber: string;
-  union?: {
-    id: number;
-    name: string;
-  };
-  tshirt?: {
-    size: string;
-    sex: string;
-    job: string;
-    quantity: number;
-  };
-}
-
-interface UserTableProps {
-  users: User[];
-}
-
-const UsersTable = ({ users }: UserTableProps) => {
-  if (users.length === 0) {
-    return <p>No members available.</p>;
-  }
-
-  const headers = Object.keys(users[0]);
-
-  return (
-    <table className="min-w-full bg-white">
-      <thead>
-        <tr>
-          {headers.map((header) => (
-            <th key={header} className="py-2 px-4 border-b border-gray-200">
-              {header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {users.map((user) => (
-          <tr key={user.id}>
-            {headers.map((header) => {
-              let cellValue: React.ReactNode = "N/A"; // Default value if none of the conditions match
-
-              if (header === "union" && user.union) {
-                // If the header is 'union' and user has a union object
-                cellValue = user.union.name ?? "N/A";
-              } else if (header === "tshirt" && user.tshirt) {
-                // If the header is 'tshirt' and user has a tshirt object
-                cellValue = `Size: ${user.tshirt.size}, Sex: ${user.tshirt.sex}, Job: ${user.tshirt.job}, Quantity: ${user.tshirt.quantity}`;
-              } else {
-                // Otherwise, we fall back to the default header value or user data
-                const value = user[header as keyof User];
-                cellValue = value
-                  ? typeof value === "object"
-                    ? JSON.stringify(value) // Convert complex objects to strings
-                    : value
-                  : "N/A"; // Default if the value is undefined or null
-              }
-
-              return (
-                <td key={header} className="py-2 px-4 border-b border-gray-200">
-                  {cellValue}
-                </td>
-              );
-            })}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-};
+import UsersTable from "@/app/components/UsersTable";
+import { useUserStore } from "@/app/store/userStore";
+import { useAuthStore } from "@/app/store/authStore";
+import Inputfield from "@/app/components/Inputfield";
 
 const AdminMembersPage = () => {
   const [isClient, setIsClient] = useState(false);
-  const { roles, sizes, sexes, jobs, unions, users } = useFetchData();
+  const { token, isHydrated } = useAuthStore();
+  const { roles, sizes, sexes, jobs, unions } = useFetchData();
+  const users = useUserStore((state) => state.users);
+  const fetchUsers = useUserStore((state) => state.fetchUsers);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [adminRole, setAdminRole] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  useEffect(() => {
+    if (token) {
+      fetchUsers(token);
+    }
+  }, [token, fetchUsers]);
+
+  const filteredUsers = users.filter(
+    (user) =>
+      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  const displayedUsers = adminRole
+    ? filteredUsers.filter((user) => user.role === "Admin")
+    : filteredUsers;
+
   if (!isClient) {
     return null;
   }
 
+  if (!isHydrated) {
+    return <div>Loading...</div>; // Optionally show a loading indicator
+  }
+
   return (
     <div>
-      <div>
-        <h1>Members Page</h1>
-        <p>Welcome to the members page.</p>
+      <div className={"flex justify-between items-baseline"}>
+        <Button
+          className="text-white py-2 bg-gladiolentext mb-2"
+          onClick={() => setRegisterModalOpen(true)}>
+          Medewerker aanmaken
+        </Button>
+        <label className={"text-white"}>
+          Admin?
+          <input
+            type="checkbox"
+            checked={adminRole}
+            onChange={() => setAdminRole(!adminRole)}
+            className={"ml-2"}
+          />
+        </label>
+        <Inputfield
+          name={"Userfilter"}
+          placeholder={"Zoek op voornaam of achternaam"}
+          value={searchTerm}
+          setValue={setSearchTerm}
+          className={"w-1/2"}
+        />
       </div>
-      <Button className="text-white py-2">
-        <Link href="#" onClick={() => setRegisterModalOpen(true)}>
-          <span className="font-bold underline">Medewerker aanmaken</span>.
-        </Link>
-      </Button>
       <Modal isOpen={registerModalOpen}>
-        <RegisterUsermodal
+        <Usermodal
           onClose={() => setRegisterModalOpen(false)}
           roles={roles}
           sizes={sizes}
@@ -118,7 +83,14 @@ const AdminMembersPage = () => {
           unions={unions}
         />
       </Modal>
-      <UsersTable users={users} />
+      <UsersTable
+        users={displayedUsers}
+        sexes={sexes}
+        jobs={jobs}
+        sizes={sizes}
+        roles={roles}
+        unions={unions}
+      />
     </div>
   );
 };
