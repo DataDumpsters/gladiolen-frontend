@@ -224,12 +224,13 @@ const Usermodal = ({
           ? "Vul onderstaande velden in om de medewerker te bewerken."
           : "Vul onderstaande velden in om een nieuwe gebruiker aan te maken."}
       </p>
-      <div className="flex flex-row gap-2">
-        <div className="flex flex-col gap-1">
-          <h3 className="text-xl font-bold">Details medewerker</h3>
+      <div className="flex flex-col gap-2">
+        <h3 className="text-xl font-bold">Medewerker</h3>
+        <div className="flex flex-col gap-2">
           <Inputfield
             name={"firstName"}
             placeholder={"voornaam"}
+            label={"Voornaam"}
             value={firstName}
             setValue={setFirstName}
             validateField={validateField}
@@ -240,6 +241,7 @@ const Usermodal = ({
           <Inputfield
             name={"lastName"}
             placeholder={"achternaam"}
+            label={"Achternaam"}
             value={lastName}
             setValue={setLastName}
             validateField={validateField}
@@ -248,6 +250,7 @@ const Usermodal = ({
           <Inputfield
             name={"phoneNumber"}
             placeholder={"telefoonnummer"}
+            label={"Telefoonnummer"}
             value={phoneNumber}
             setValue={setPhoneNumber}
             validateField={validateField}
@@ -258,33 +261,27 @@ const Usermodal = ({
           <Inputfield
             name={"email"}
             placeholder={"email"}
+            label={"Email"}
             value={email}
             setValue={setEmail}
             validateField={validateField}
             onBlur={() => checkEmailExists(email)}
           />
           {errors.email && <p className="text-red-500">{errors.email}</p>}
-        </div>
-        <div className="flex flex-col">
-          <select
+          <Dropdown
             name={"role"}
+            label={"Rol"}
+            title={"rol"}
+            items={roles}
             value={role}
-            onChange={(e) => {
-              setRole(e.target.value);
-              validateField("role", e.target.value);
-            }}
-            className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5">
-            <option value="">Selecteer een rol</option>
-            {roles.map((role) => (
-              <option key={role} value={role}>
-                {role}
-              </option>
-            ))}
-          </select>
+            setValue={setRole}
+            validateField={validateField}
+          />
           {errors.role && <p className="text-red-500">{errors.role}</p>}
           <Inputfield
             name={"registryNumber"}
             placeholder={"rijksregisternummer"}
+            label={"Rijksregisternummer"}
             value={registryNumber}
             setValue={setRegistryNumber}
             validateField={validateField}
@@ -295,6 +292,7 @@ const Usermodal = ({
           <Inputfield
             name={"password"}
             placeholder={"wachtwoord"}
+            label={"Wachtwoord"}
             value={password}
             setValue={setPassword}
             validateField={validateField}
@@ -304,6 +302,7 @@ const Usermodal = ({
           <Inputfield
             name={"checkPassword"}
             placeholder={"check wachtwoord"}
+            label={"Check wachtwoord"}
             value={checkPassword}
             setValue={setCheckPassword}
             validateField={validateField}
@@ -313,10 +312,11 @@ const Usermodal = ({
             <p className="text-red-500">{errors.checkPassword}</p>
           )}
         </div>
-        <div className="flex flex-col">
-          <h3 className="text-xl font-bold">Tshirt Details</h3>
+        <h3 className="text-xl font-bold">Tshirt</h3>
+        <div className="flex flex-col gap-2">
           <Dropdown
             name={"size"}
+            label={"Maat"}
             title={"maat"}
             items={sizes}
             value={size}
@@ -324,6 +324,7 @@ const Usermodal = ({
           />
           <Dropdown
             name={"sex"}
+            label={"Geslacht"}
             title={"geslacht"}
             items={sexes}
             value={sex}
@@ -331,36 +332,42 @@ const Usermodal = ({
           />
           <Dropdown
             name={"job"}
+            label={"Functie"}
             title={"job"}
             items={jobs}
             value={job}
             setValue={setJob}
           />
-          <FilteredDropdown
-            name={"union"}
-            title={"vereniging"}
-            items={unions}
-            value={unionId}
-            setValue={(value) => {
-              const selectedUnion = unions.find(
-                (union) => union.id.toString() === value,
-              );
-              if (selectedUnion) {
-                setUnionId(selectedUnion.id.toString()); // Make sure to set as string
-              } else {
-                setUnionId(""); // Handle the case when no value is selected
-              }
-            }}
-          />
+          <h3 className="text-xl font-bold mb-1">Vereniging</h3>
+          <div className="relative">
+            <label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500 z-10">
+              Vereniging
+            </label>
+            <FilteredDropdown
+              title={"vereniging"}
+              items={unions}
+              value={unionId}
+              setValue={(value) => {
+                const selectedUnion = unions.find(
+                  (union) => union.id.toString() === value,
+                );
+                if (selectedUnion) {
+                  setUnionId(selectedUnion.id.toString()); // Make sure to set as string
+                } else {
+                  setUnionId(""); // Handle the case when no value is selected
+                }
+              }}
+            />
+          </div>
           <div className="flex items-center">
-            <label className="mr-2">Vrijdag & zaterdag?</label>
+            <label className="mr-2">Vrijdag & zaterdag aanwezig?</label>
             <input
               type="checkbox"
               name={"quantity"}
               checked={quantity === 2}
               value={quantity}
               onChange={(e) => setQuantity(e.target.checked ? 2 : 1)}
-              className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5"
+              className="rounded-xl border border-solid border-gray-300 h-12 sm:h-14 w-4 sm:w-4 px-4 sm:px-5"
             />
           </div>
         </div>

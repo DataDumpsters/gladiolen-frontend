@@ -98,25 +98,31 @@ const UsersTable = ({
               <td>{user.tshirt?.sex}</td>
               <td>{user.tshirt?.job}</td>
               {/*<td>{user.tshirt?.quantity}</td>*/}
-              <td className={"inline-flex justify-center"}>
-                <PencilIcon
-                  className="h-6 w-6 text-green-400"
-                  onClick={() => {
-                    setSelectedUserId(user.id);
-                    setIsUsermodalOpen(true);
-                  }}
-                />
-              </td>
-              <td>
-                {user.role !== "Admin" && (
-                  <TrashIcon
-                    className="h-6 w-6 text-red-500"
+              <td className={"flex justify-center items-center"}>
+                <div className="flex justify-center items-center">
+                  <PencilIcon
+                    className="h-6 w-6 text-green-400"
                     onClick={() => {
                       setSelectedUserId(user.id);
-                      setIsDeleteModalOpen(true);
+                      setIsUsermodalOpen(true);
                     }}
                   />
-                )}
+                </div>
+              </td>
+              <td>
+                <div className="flex justify-center items-center">
+                  {user.role !== "Admin" ? (
+                    <TrashIcon
+                      className="h-6 w-6 text-red-500"
+                      onClick={() => {
+                        setSelectedUserId(user.id);
+                        setIsDeleteModalOpen(true);
+                      }}
+                    />
+                  ) : (
+                    <span className="h-6 w-6 inline-block"></span>
+                  )}
+                </div>
               </td>
             </tr>
           ))}

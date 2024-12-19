@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 interface FilteredDropdownProps {
-  name: string;
   title: string;
   items: { id: number; name: string }[];
   value: string;
@@ -9,7 +8,6 @@ interface FilteredDropdownProps {
 }
 
 const FilteredDropdown = ({
-  name,
   title,
   items,
   value,
@@ -29,9 +27,6 @@ const FilteredDropdown = ({
 
   return (
     <div className="flex flex-col">
-      <label htmlFor={name} className="font-bold">
-        {title}
-      </label>
       <div className="relative">
         <button
           type="button"
@@ -39,13 +34,13 @@ const FilteredDropdown = ({
           onClick={() => setIsOpen(!isOpen)}>
           {value
             ? items.find((item) => item.id.toString() === value)?.name
-            : `Select ${title}`}
+            : `Selecteer een ${title}`}
         </button>
         {isOpen && (
           <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg">
             <input
               type="text"
-              placeholder={`Zoek ${title}`}
+              placeholder={`\u{1F50D} Zoek ${title}`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 border-b border-gray-300"

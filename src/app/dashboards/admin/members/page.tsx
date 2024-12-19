@@ -56,7 +56,7 @@ const AdminMembersPage = () => {
           onClick={() => setRegisterModalOpen(true)}>
           Medewerker aanmaken
         </Button>
-        <label className={"text-white"}>
+        <label className={"text-white ml-4"}>
           Admin?
           <input
             type="checkbox"
@@ -65,13 +65,15 @@ const AdminMembersPage = () => {
             className={"ml-2"}
           />
         </label>
-        <Inputfield
-          name={"Userfilter"}
-          placeholder={"Zoek op voornaam of achternaam"}
-          value={searchTerm}
-          setValue={setSearchTerm}
-          className={"w-1/2"}
-        />
+        <div className="flex-grow ml-4">
+          <Inputfield
+            name={"Userfilter"}
+            placeholder={"Zoek op voornaam of achternaam"}
+            value={searchTerm}
+            setValue={setSearchTerm}
+            className={"flex-grow"}
+          />
+        </div>
       </div>
       <Modal isOpen={registerModalOpen}>
         <Usermodal
