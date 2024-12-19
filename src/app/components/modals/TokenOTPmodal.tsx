@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Button from "../Button";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "../../providers/context";
@@ -16,9 +16,16 @@ const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
   const [isTokenValid, setIsTokenValid] = useState(false);
   const router = useRouter();
   const { basename } = useAppContext();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Zustand actions
   const setAuthToken = useAuthStore((state) => state.setToken);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   const handleTokenSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +89,7 @@ const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
         placeholder="Code"
         value={token}
         onChange={(e) => setTokenInput(e.target.value)}
+        ref={inputRef}
         className="rounded-xl border border-solid border-gray-300 h-10 sm:h-12 px-4 sm:px-5"
       />
       <div className="flex flex-row items-baseline justify-between">
