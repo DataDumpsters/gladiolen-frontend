@@ -1,0 +1,20 @@
+@font-face {
+  font-family: "GT-Flexa-Compressed-Black";
+  src: url("GT-Flexa-Compressed-Black.otf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GT-Rand-Medium";
+  src: url("Rand-Medium.otf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GT-Rand-Heavy";
+  src: url("Rand-Heavy.otf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
