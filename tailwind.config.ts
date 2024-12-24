@@ -13,6 +13,12 @@ export default {
         gladiolenfg: "#FFBCE5",
         gladiolentext: "#950F66",
       },
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+        gladiolenflexa: ["GT-Flexa-Compressed-Black", "sans-serif"],
+        gladiolenrandmedium: ["GT-Rand-Medium", "sans-serif"],
+        gladiolenrandheavy: ["GT-Rand-Heavy", "sans-serif"],
+      },
     },
   },
   plugins: [],

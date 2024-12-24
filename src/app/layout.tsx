@@ -1,10 +1,7 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
+import "./../../public/fonts/gladiolen.css";
 import React from "react";
 import { AppProvider } from "@/app/providers/context";
-
-// Load Google Font
-const inter = Inter({ subsets: ["latin"] });
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -14,7 +11,7 @@ const RootLayout = ({ children }: RootLayoutProps) => {
   return (
     <html lang="en">
       <body
-        className={`${inter.className} flex flex-col min-h-screen bg-gladiolenbg`}>
+        className={`font-gladiolenrandmedium flex flex-col min-h-screen bg-gladiolenbg`}>
         <AppProvider>
           <header className="header flex-none">
             {/*<div className="container mx-auto text-center">*/}

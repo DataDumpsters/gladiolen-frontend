@@ -7,6 +7,7 @@ import Forgotpasswordmodal from "@/app/components/modals/Forgotpasswordmodal";
 import Modal from "@/app/components/Modal";
 import TokenOTPmodal from "@/app/components/modals/TokenOTPmodal";
 import Inputfield from "@/app/components/Inputfield";
+import Image from "next/image";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -56,7 +57,14 @@ const Login = () => {
     <div>
       <form
         onSubmit={handleLogin}
-        className="flex flex-col p-16 bg-white text-gladiolentext shadow-md rounded-xl">
+        className="flex flex-col p-12 bg-white text-gladiolentext shadow-md rounded-xl">
+        <Image
+          src="/images/LogoBig.svg"
+          alt="GladiolenFestival"
+          width={250}
+          height={100}
+          className={"mx-auto mb-4"}
+        />
         <h1 className="text-3xl font-bold mb-4">
           Welkom bij GladiolenRegister!
         </h1>
