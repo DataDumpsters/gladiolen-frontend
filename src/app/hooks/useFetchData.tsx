@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/app/store/authStore";
+import fetchWithAuth from "@/app/utils/fetchWithAuth";
 
 const useFetchData = () => {
   const [roles, setRoles] = useState([]);
@@ -12,27 +13,21 @@ const useFetchData = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      };
-
       console.log("Weeral checken", accessToken);
 
       const fetchJson = async (url: string) => {
-        const response = await fetch(url, { headers });
-        const text = await response.text();
-
-        if (!text) {
-          console.warn(`Empty response from ${url}`);
-          return null;
-        }
-
         try {
+          const response = await fetchWithAuth(url);
+          const text = await response.text();
+
+          if (!text) {
+            console.warn(`Empty response from ${url}`);
+            return null;
+          }
+
           return JSON.parse(text);
         } catch (error) {
-          console.error(`Failed to parse JSON from ${url}:`, error);
-          console.log(`Response causing the error: ${text}`);
+          console.error(`Failed to fetch data from ${url}:`, error);
           return null;
         }
       };

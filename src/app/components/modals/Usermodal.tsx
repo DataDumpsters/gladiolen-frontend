@@ -7,6 +7,7 @@ import { useAuthStore } from "@/app/store/authStore";
 import { useUserStore } from "@/app/store/userStore";
 import Dropdown from "@/app/components/Dropdown";
 import FilteredDropdown from "@/app/components/FilteredDropdown";
+import fetchWithAuth from "@/app/utils/fetchWithAuth";
 
 interface UsermodalProps {
   onClose: () => void;
@@ -50,11 +51,9 @@ const Usermodal = ({
       // Fetch user data when userId is provided
       const fetchUserData = async () => {
         try {
-          const response = await fetch(`http://localhost:8080/user/${userId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await fetchWithAuth(
+            `http://localhost:8080/user/${userId}`,
+          );
           if (response.ok) {
             const user = await response.json();
             setFirstName(user.firstName);

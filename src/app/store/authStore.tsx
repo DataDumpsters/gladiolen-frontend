@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import SecureLS from "secure-ls";
+import { jwtDecode } from "jwt-decode";
 
 let ls: SecureLS | null = null;
 
@@ -16,11 +17,13 @@ interface AuthState {
   isHydrated: boolean;
   setToken: (accessToken: string, refreshToken: string) => void;
   clearTokens: () => void;
+  isTokenExpired: () => boolean;
+  refreshAccessToken: () => Promise<string | null>;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       accessToken: null,
       refreshToken: null,
       isHydrated: false,
@@ -36,6 +39,38 @@ export const useAuthStore = create<AuthState>()(
         set({ accessToken: null, refreshToken: null, isHydrated: false });
         if (ls) {
           ls.remove("auth-storage");
+        }
+      },
+      isTokenExpired: () => {
+        const { accessToken } = get();
+        if (!accessToken) return true;
+        try {
+          const decoded: { exp: number } = jwtDecode(accessToken);
+          return decoded.exp * 1000 < Date.now();
+        } catch (error) {
+          return true;
+        }
+      },
+      refreshAccessToken: async () => {
+        const { refreshToken } = get();
+        if (!refreshToken) return null;
+        try {
+          const response = await fetch("http://localhost:8080/refresh-token", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ refreshToken: refreshToken }),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            set({ accessToken: data.accessToken });
+            return data.accessToken;
+          } else {
+            return null;
+          }
+        } catch (error) {
+          return null;
         }
       },
     }),
