@@ -12,7 +12,7 @@ import Inputfield from "@/app/components/Inputfield";
 
 const AdminMembersPage = () => {
   const [isClient, setIsClient] = useState(false);
-  const { token, isHydrated } = useAuthStore();
+  const { accessToken, isHydrated } = useAuthStore();
   const { roles, sizes, sexes, jobs, unions } = useFetchData();
   const users = useUserStore((state) => state.users);
   const fetchUsers = useUserStore((state) => state.fetchUsers);
@@ -25,10 +25,10 @@ const AdminMembersPage = () => {
   }, []);
 
   useEffect(() => {
-    if (token) {
-      fetchUsers(token);
+    if (accessToken) {
+      fetchUsers(accessToken);
     }
-  }, [token, fetchUsers]);
+  }, [accessToken, fetchUsers]);
 
   const filteredUsers = users.filter(
     (user) =>

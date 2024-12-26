@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import Button from "@/app/components/Button";
 import Inputfield from "@/app/components/Inputfield";
@@ -40,7 +42,7 @@ const Usermodal = ({
   const [unionId, setUnionId] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [isUserMade, setIsUserMade] = useState(false);
-  const token = useAuthStore((state) => state.token);
+  const token = useAuthStore((state) => state.accessToken);
   const fetchUsers = useUserStore((state) => state.fetchUsers);
 
   useEffect(() => {

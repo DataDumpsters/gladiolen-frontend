@@ -1,3 +1,5 @@
+"use client";
+
 import { useAuthStore } from "@/app/store/authStore";
 import { PencilIcon, TrashIcon } from "@heroicons/react/20/solid";
 import React, { useState } from "react";

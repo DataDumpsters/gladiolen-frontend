@@ -47,8 +47,9 @@ const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
         const data = await response.json();
 
         // Call Zustand's setToken to persist the token
-        setAuthToken(data.accessToken);
+        setAuthToken(data.accessToken, data.refreshToken);
         console.log("Token set successfully:", data.accessToken);
+        console.log("Refresh Token set successfully:", data.refreshToken);
 
         setIsTokenValid(true);
 

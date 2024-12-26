@@ -8,16 +8,16 @@ const useFetchData = () => {
   const [jobs, setJobs] = useState([]);
   const [unions, setUnions] = useState([]);
   const [users, setUsers] = useState<User[]>([]);
-  const { token } = useAuthStore();
+  const { accessToken } = useAuthStore();
 
   useEffect(() => {
     const fetchData = async () => {
       const headers = {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${accessToken}`,
       };
 
-      console.log("Weeral checken", token);
+      console.log("Weeral checken", accessToken);
 
       const fetchJson = async (url: string) => {
         const response = await fetch(url, { headers });
@@ -64,7 +64,7 @@ const useFetchData = () => {
     };
 
     fetchData();
-  }, [token]);
+  }, [accessToken]);
 
   return { roles, sizes, sexes, jobs, unions, users };
 };

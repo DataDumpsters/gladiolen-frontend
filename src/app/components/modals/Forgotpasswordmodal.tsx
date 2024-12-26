@@ -96,6 +96,8 @@
 //
 // export default Forgotpasswordmodal;
 
+"use client";
+
 import React, { useState } from "react";
 import Button from "../Button";
 import { useAuthStore } from "@/app/store/authStore";
@@ -114,7 +116,7 @@ const Forgotpasswordmodal = ({ onClose }: ForgotpasswordmodalProps) => {
 
   // Zustand actions
   const setAuthToken = useAuthStore((state) => state.setToken);
-  const token = useAuthStore((state) => state.token);
+  const token = useAuthStore((state) => state.accessToken);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,8 +163,9 @@ const Forgotpasswordmodal = ({ onClose }: ForgotpasswordmodalProps) => {
         const data = await response.json();
 
         // Call Zustand's setToken to persist the token
-        setAuthToken(data.accessToken);
-        console.log("Token set successfully:", data.accessToken);
+        setAuthToken(data.accessToken, data.refreshToken);
+        console.log("AccessToken set successfully:", data.accessToken);
+        console.log("RefreshToken set successfully:", data.refreshToken);
         setStep(3);
       } else {
         setMessage("Invalid code");

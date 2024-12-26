@@ -1,38 +1,51 @@
+"use client";
+
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { jwtDecode } from "jwt-decode";
+import SecureLS from "secure-ls";
+
+let ls: SecureLS | null = null;
+
+if (typeof window !== "undefined") {
+  ls = new SecureLS({ encodingType: "aes" });
+}
 
 interface AuthState {
-  token: string | null;
-  userRole: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
   isHydrated: boolean;
-  setToken: (token: string) => void;
+  setToken: (accessToken: string, refreshToken: string) => void;
+  clearTokens: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      token: null,
-      userRole: null,
+      accessToken: null,
+      refreshToken: null,
       isHydrated: false,
-      setToken: (token: string) => {
-        if (!token) return; // Ensure the token is not null or undefined
-
-        try {
-          const decodedToken = jwtDecode<{ role: string }>(token);
-          set({
-            token, // Save the raw token, do not manipulate or stringify
-            userRole: decodedToken.role,
-            isHydrated: true,
-          });
-        } catch (error) {
-          console.error("Failed to decode token:", error);
+      setToken: (accessToken: string, refreshToken: string) => {
+        if (!accessToken || !refreshToken) return; // Ensure the token is not null or undefined
+        set({
+          accessToken, // Save the raw token, do not manipulate or stringify
+          refreshToken, // Save the raw token, do not manipulate or stringify
+          isHydrated: true,
+        });
+      },
+      clearTokens: () => {
+        set({ accessToken: null, refreshToken: null, isHydrated: false });
+        if (ls) {
+          ls.remove("auth-storage");
         }
       },
     }),
     {
-      name: "auth-storage", // Key used in localStorage
-      storage: createJSONStorage(() => localStorage), // Zustand handles serialization
+      name: "auth-storage",
+      storage: createJSONStorage(() => ({
+        getItem: (key) => (ls ? ls.get(key) : null),
+        setItem: (key, value) => ls?.set(key, value),
+        removeItem: (key) => ls?.remove(key),
+      })),
     },
   ),
 );
