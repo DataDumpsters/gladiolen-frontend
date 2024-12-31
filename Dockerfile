@@ -4,9 +4,6 @@ FROM node:18-alpine
 # Set the working directory
 WORKDIR /app
 
-# Install curl
-RUN apk update && apk add curl
-
 # Copy package.json and pnpm-lock.yaml to the working directory
 COPY package.json pnpm-lock.yaml ./
 
