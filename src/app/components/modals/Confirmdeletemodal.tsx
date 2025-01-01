@@ -2,6 +2,7 @@ import React from "react";
 import Button from "@/app/components/Button";
 import { useAuthStore } from "@/app/store/authStore";
 import { useUserStore } from "@/app/store/userStore";
+import fetchWithAuth from "@/app/utils/fetchWithAuth";
 
 interface ConfirmdeletemodalProps {
   onClose: () => void;
@@ -9,18 +10,13 @@ interface ConfirmdeletemodalProps {
 }
 
 const Confirmdeletemodal = ({ onClose, userId }: ConfirmdeletemodalProps) => {
-  const token = useAuthStore((state) => state.token);
   const removeUser = useUserStore((state) => state.removeUser);
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:8080/admin/user/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetchWithAuth(
+        `http://localhost:8080/admin/user/${id}`,
+      );
       if (response.ok) {
         removeUser(id);
         onClose();
