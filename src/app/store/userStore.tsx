@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import fetchWithAuth from "@/app/utils/fetchWithAuth";
 
 interface UserStore {
   users: User[];
@@ -26,11 +27,7 @@ export const useUserStore = create<UserStore>((set) => ({
     })),
   fetchUsers: async (token) => {
     try {
-      const response = await fetch("http://localhost:8080/user/all", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetchWithAuth("http://localhost:8080/user/all");
       if (response.ok) {
         const data = await response.json();
         set({ users: data });

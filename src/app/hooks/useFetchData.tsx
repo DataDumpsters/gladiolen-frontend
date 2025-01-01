@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/app/store/authStore";
+import fetchWithAuth from "@/app/utils/fetchWithAuth";
 
 const useFetchData = () => {
   const [roles, setRoles] = useState([]);
@@ -8,31 +9,25 @@ const useFetchData = () => {
   const [jobs, setJobs] = useState([]);
   const [unions, setUnions] = useState([]);
   const [users, setUsers] = useState<User[]>([]);
-  const { token } = useAuthStore();
+  const { accessToken } = useAuthStore();
 
   useEffect(() => {
     const fetchData = async () => {
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      };
-
-      console.log("Weeral checken", token);
+      console.log("Weeral checken", accessToken);
 
       const fetchJson = async (url: string) => {
-        const response = await fetch(url, { headers });
-        const text = await response.text();
-
-        if (!text) {
-          console.warn(`Empty response from ${url}`);
-          return null;
-        }
-
         try {
+          const response = await fetchWithAuth(url);
+          const text = await response.text();
+
+          if (!text) {
+            console.warn(`Empty response from ${url}`);
+            return null;
+          }
+
           return JSON.parse(text);
         } catch (error) {
-          console.error(`Failed to parse JSON from ${url}:`, error);
-          console.log(`Response causing the error: ${text}`);
+          console.error(`Failed to fetch data from ${url}:`, error);
           return null;
         }
       };
@@ -64,7 +59,7 @@ const useFetchData = () => {
     };
 
     fetchData();
-  }, [token]);
+  }, [accessToken]);
 
   return { roles, sizes, sexes, jobs, unions, users };
 };

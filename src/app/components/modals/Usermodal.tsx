@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import Button from "@/app/components/Button";
 import Inputfield from "@/app/components/Inputfield";
@@ -5,6 +7,7 @@ import { useAuthStore } from "@/app/store/authStore";
 import { useUserStore } from "@/app/store/userStore";
 import Dropdown from "@/app/components/Dropdown";
 import FilteredDropdown from "@/app/components/FilteredDropdown";
+import fetchWithAuth from "@/app/utils/fetchWithAuth";
 
 interface UsermodalProps {
   onClose: () => void;
@@ -40,7 +43,7 @@ const Usermodal = ({
   const [unionId, setUnionId] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [isUserMade, setIsUserMade] = useState(false);
-  const token = useAuthStore((state) => state.token);
+  const token = useAuthStore((state) => state.accessToken);
   const fetchUsers = useUserStore((state) => state.fetchUsers);
 
   useEffect(() => {
@@ -48,11 +51,9 @@ const Usermodal = ({
       // Fetch user data when userId is provided
       const fetchUserData = async () => {
         try {
-          const response = await fetch(`http://localhost:8080/user/${userId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await fetchWithAuth(
+            `http://localhost:8080/user/${userId}`,
+          );
           if (response.ok) {
             const user = await response.json();
             setFirstName(user.firstName);
