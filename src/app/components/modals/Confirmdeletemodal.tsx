@@ -1,6 +1,5 @@
 import React from "react";
 import Button from "@/app/components/Button";
-import { useAuthStore } from "@/app/store/authStore";
 import { useUserStore } from "@/app/store/userStore";
 import fetchWithAuth from "@/app/utils/fetchWithAuth";
 
