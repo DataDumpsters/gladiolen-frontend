@@ -15,6 +15,7 @@ const Confirmdeletemodal = ({ onClose, userId }: ConfirmdeletemodalProps) => {
     try {
       const response = await fetchWithAuth(
         `http://localhost:8080/admin/user/${id}`,
+        // Ensure the token is not null or undefined
       );
       if (response.ok) {
         removeUser(id);
