@@ -9,6 +9,7 @@ import TokenOTPmodal from "@/app/components/modals/TokenOTPmodal";
 import Inputfield from "@/app/components/Inputfield";
 import Image from "next/image";
 import fetchWithAuth from "@/app/utils/fetchWithAuth";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -25,7 +26,7 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetchWithAuth("http://localhost:8080/login", {
+      const response = await fetchWithAuth(`${apiUrl}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

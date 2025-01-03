@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import SecureLS from "secure-ls";
 import { jwtDecode } from "jwt-decode";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 let ls: SecureLS | null = null;
 
@@ -55,7 +56,7 @@ export const useAuthStore = create<AuthState>()(
         const { refreshToken } = get();
         if (!refreshToken) return null;
         try {
-          const response = await fetch("http://localhost:8080/refresh-token", {
+          const response = await fetch(`${apiUrl}/refresh-token`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
