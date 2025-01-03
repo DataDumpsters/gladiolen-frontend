@@ -40,7 +40,7 @@ jobs:
 
       - name: Build and tag frontend image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/gladiolen-frontend:latest ./gladiolen-frontend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/gladiolen-frontend:latest .
           docker tag ${{ secrets.DOCKER_USERNAME }}/gladiolen-frontend:latest ${{ secrets.DOCKER_USERNAME }}/gladiolen-frontend:latest
 
       - name: Push frontend image to Docker Hub
