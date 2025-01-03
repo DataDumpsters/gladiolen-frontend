@@ -3,6 +3,6 @@ interface Tshirt {
   size: Size;
   sex: Sex;
   job: Job;
-  quantity: number;
+  totalQuantity: number;
   user?: User;
 }
