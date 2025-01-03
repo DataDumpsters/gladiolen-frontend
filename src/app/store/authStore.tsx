@@ -56,7 +56,7 @@ export const useAuthStore = create<AuthState>()(
         const { refreshToken } = get();
         if (!refreshToken) return null;
         try {
-          const response = await fetch("http://backend:8080/refresh-token", {
+          const response = await fetch("http://localhost:8080/refresh-token", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",

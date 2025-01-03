@@ -26,7 +26,7 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetchWithAuth("http://backend:8080/login", {
+      const response = await fetchWithAuth("http://localhost:8080/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
