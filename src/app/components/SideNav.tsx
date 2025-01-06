@@ -6,10 +6,14 @@ import { useAppContext } from "@/app/providers/context";
 import Image from "next/image";
 import Button from "@/app/components/Button";
 import { ArrowLeftStartOnRectangleIcon } from "@heroicons/react/20/solid";
-import { useLinkStore } from "@/app/store/linkStore"; // Import the Zustand store
-import { useAuthStore } from "@/app/store/authStore";
+import { useLinkStore } from "@/app/stores/linkStore"; // Import the Zustand store
+import { useAuthStore } from "@/app/stores/authStore";
 
-const SideNav = () => {
+interface SideNavProps {
+  className?: string;
+}
+
+const SideNav = ({ className }: { className?: string }) => {
   const { basename } = useAppContext(); // Access basename from context
   const { activeRoute, setActiveRoute } = useLinkStore() as {
     activeRoute: string;
@@ -19,7 +23,8 @@ const SideNav = () => {
   const clearTokens = useAuthStore((state) => state.clearTokens);
 
   return (
-    <nav className="fixed top-0 left-0 flex flex-col items-center bg-white text-gladiolentext text-xl w-64 h-full">
+    <nav
+      className={`fixed top-0 left-0 flex flex-col items-center bg-white text-gladiolentext text-xl w-64 h-full ${className}`}>
       <div className="mb-8">
         <Image
           src={"/images/LogoBig.svg"}
@@ -92,9 +97,9 @@ const SideNav = () => {
             ? "bg-gladiolenbg text-white"
             : "hover:bg-gladiolenbg hover:text-white"
         }`}>
-        <div className={`flex`}>
-          <ArrowLeftStartOnRectangleIcon className="w-8 h-8 mt-8" />
-          <Button className="w-full">Logout</Button>
+        <div className="flex justify-center items-center">
+          <Button>Logout</Button>
+          <ArrowLeftStartOnRectangleIcon className="w-8 h-8" />
         </div>
       </Link>
     </nav>

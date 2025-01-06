@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import Button from "@/app/components/Button";
 import Inputfield from "@/app/components/Inputfield";
-import { useAuthStore } from "@/app/store/authStore";
-import { useUserStore } from "@/app/store/userStore";
+import { useAuthStore } from "@/app/stores/authStore";
+import { useUserStore } from "@/app/stores/userStore";
 import Dropdown from "@/app/components/Dropdown";
 import FilteredDropdown from "@/app/components/FilteredDropdown";
 import fetchWithAuth from "@/app/utils/fetchWithAuth";
@@ -80,7 +80,7 @@ const Usermodal = ({
 
       fetchUserData();
     }
-  }, [userId, token]);
+  }, [userId]);
 
   const validateField = (name: string, value: string) => {
     let error = "";
@@ -196,7 +196,7 @@ const Usermodal = ({
 
         if (response.ok) {
           setIsUserMade(true);
-          await fetchUsers(token);
+          await fetchUsers();
           onClose();
         } else {
           const errorMessage = await response.text();
@@ -225,168 +225,159 @@ const Usermodal = ({
           ? "Vul onderstaande velden in om de medewerker te bewerken."
           : "Vul onderstaande velden in om een nieuwe gebruiker aan te maken."}
       </p>
-      <div className="flex flex-col gap-2">
-        <h3 className="text-xl font-bold">Medewerker</h3>
-        <div className="flex flex-col gap-2">
-          <Inputfield
-            name={"firstName"}
-            placeholder={"voornaam"}
-            label={"Voornaam"}
-            value={firstName}
-            setValue={setFirstName}
-            validateField={validateField}
-          />
-          {errors.firstName && (
-            <p className="text-red-500">{errors.firstName}</p>
-          )}
-          <Inputfield
-            name={"lastName"}
-            placeholder={"achternaam"}
-            label={"Achternaam"}
-            value={lastName}
-            setValue={setLastName}
-            validateField={validateField}
-          />
-          {errors.lastName && <p className="text-red-500">{errors.lastName}</p>}
-          <Inputfield
-            name={"phoneNumber"}
-            placeholder={"telefoonnummer"}
-            label={"Telefoonnummer"}
-            value={phoneNumber}
-            setValue={setPhoneNumber}
-            validateField={validateField}
-          />
-          {errors.phoneNumber && (
-            <p className="text-red-500">{errors.phoneNumber}</p>
-          )}
-          <Inputfield
-            name={"email"}
-            placeholder={"email"}
-            label={"Email"}
-            value={email}
-            setValue={setEmail}
-            validateField={validateField}
-            onBlur={() => checkEmailExists(email)}
-          />
-          {errors.email && <p className="text-red-500">{errors.email}</p>}
-          <Dropdown
-            name={"role"}
-            label={"Rol"}
-            title={"rol"}
-            items={roles}
-            value={role}
-            setValue={setRole}
-            validateField={validateField}
-          />
-          {errors.role && <p className="text-red-500">{errors.role}</p>}
-          <Inputfield
-            name={"registryNumber"}
-            placeholder={"rijksregisternummer"}
-            label={"Rijksregisternummer"}
-            value={registryNumber}
-            setValue={setRegistryNumber}
-            validateField={validateField}
-          />
-          {errors.registryNumber && (
-            <p className="text-red-500">{errors.registryNumber}</p>
-          )}
-          <Inputfield
-            name={"password"}
-            placeholder={"wachtwoord"}
-            label={"Wachtwoord"}
-            value={password}
-            setValue={setPassword}
-            validateField={validateField}
-            type={"password"}
-          />
-          {errors.password && <p className="text-red-500">{errors.password}</p>}
-          <Inputfield
-            name={"checkPassword"}
-            placeholder={"check wachtwoord"}
-            label={"Check wachtwoord"}
-            value={checkPassword}
-            setValue={setCheckPassword}
-            validateField={validateField}
-            type={"password"}
-          />
-          {errors.checkPassword && (
-            <p className="text-red-500">{errors.checkPassword}</p>
-          )}
-        </div>
-        <h3 className="text-xl font-bold">Tshirt</h3>
-        <div className="flex flex-col gap-2">
-          <Dropdown
-            name={"size"}
-            label={"Maat"}
-            title={"maat"}
-            items={sizes}
-            value={size}
-            setValue={setSize}
-          />
-          <Dropdown
-            name={"sex"}
-            label={"Geslacht"}
-            title={"geslacht"}
-            items={sexes}
-            value={sex}
-            setValue={setSex}
-          />
-          <Dropdown
-            name={"job"}
-            label={"Functie"}
-            title={"job"}
-            items={jobs}
-            value={job}
-            setValue={setJob}
-          />
-          <h3 className="text-xl font-bold mb-1">Vereniging</h3>
-          <div className="relative">
-            <label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500 z-10">
-              Vereniging
-            </label>
-            <FilteredDropdown
-              title={"vereniging"}
-              items={unions}
-              value={unionId}
-              setValue={(value) => {
-                const selectedUnion = unions.find(
-                  (union) => union.id.toString() === value,
-                );
-                if (selectedUnion) {
-                  setUnionId(selectedUnion.id.toString()); // Make sure to set as string
-                } else {
-                  setUnionId(""); // Handle the case when no value is selected
-                }
-              }}
+      <div className="flex flex-col">
+        <div className="flex flew-row gap-2">
+          <div className="flex flex-col w-1/2 gap-2">
+            <h3 className="text-xl font-bold">Medewerker</h3>
+            <Inputfield
+              name={"firstName"}
+              placeholder={"voornaam"}
+              label={"Voornaam"}
+              value={firstName}
+              setValue={setFirstName}
+              validateField={validateField}
+              className="w-full"
             />
-          </div>
-          <div className="flex items-center">
-            <label className="mr-2">Vrijdag & zaterdag aanwezig?</label>
-            <input
-              type="checkbox"
-              name={"quantity"}
-              checked={quantity === 2}
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.checked ? 2 : 1)}
-              className="rounded-xl border border-solid border-gray-300 h-12 sm:h-14 w-4 sm:w-4 px-4 sm:px-5"
+            {errors.firstName && (
+              <p className="text-red-500">{errors.firstName}</p>
+            )}
+            <Inputfield
+              name={"lastName"}
+              placeholder={"achternaam"}
+              label={"Achternaam"}
+              value={lastName}
+              setValue={setLastName}
+              validateField={validateField}
             />
+            {errors.lastName && (
+              <p className="text-red-500">{errors.lastName}</p>
+            )}
+            <Inputfield
+              name={"phoneNumber"}
+              placeholder={"telefoonnummer"}
+              label={"Telefoonnummer"}
+              value={phoneNumber}
+              setValue={setPhoneNumber}
+              validateField={validateField}
+            />
+            {errors.phoneNumber && (
+              <p className="text-red-500">{errors.phoneNumber}</p>
+            )}
+            <Inputfield
+              name={"email"}
+              placeholder={"email"}
+              label={"Email"}
+              value={email}
+              setValue={setEmail}
+              validateField={validateField}
+              onBlur={() => checkEmailExists(email)}
+            />
+            {errors.email && <p className="text-red-500">{errors.email}</p>}
+            <Dropdown
+              name={"role"}
+              label={"Rol"}
+              title={"rol"}
+              items={roles}
+              value={role}
+              setValue={setRole}
+              validateField={validateField}
+            />
+            {errors.role && <p className="text-red-500">{errors.role}</p>}
+            <Inputfield
+              name={"registryNumber"}
+              placeholder={"rijksregisternummer"}
+              label={"Rijksregisternummer"}
+              value={registryNumber}
+              setValue={setRegistryNumber}
+              validateField={validateField}
+            />
+            {errors.registryNumber && (
+              <p className="text-red-500">{errors.registryNumber}</p>
+            )}
+            <Inputfield
+              name={"password"}
+              placeholder={"wachtwoord"}
+              label={"Wachtwoord"}
+              value={password}
+              setValue={setPassword}
+              validateField={validateField}
+              type={"password"}
+            />
+            {errors.password && (
+              <p className="text-red-500">{errors.password}</p>
+            )}
+            <Inputfield
+              name={"checkPassword"}
+              placeholder={"check wachtwoord"}
+              label={"Check wachtwoord"}
+              value={checkPassword}
+              setValue={setCheckPassword}
+              validateField={validateField}
+              type={"password"}
+            />
+            {errors.checkPassword && (
+              <p className="text-red-500">{errors.checkPassword}</p>
+            )}
           </div>
-        </div>
-      </div>
-      <div className="flex flex-row items-baseline justify-between">
-        <div className="flex justify-start">
-          <Button
-            className="bg-gladiolentext text-white mr-1"
-            type="button"
-            onClick={handleUser}>
-            {userId ? "Bewerken" : "Aanmaken"}
-          </Button>
-          <Button
-            className="bg-red-500 text-white"
-            type="button"
-            onClick={onClose}>
-            Annuleren
-          </Button>
+          <div className="flex flex-col gap-2 w-1/2">
+            <h3 className="text-xl font-bold">Tshirt</h3>
+            <Dropdown
+              name={"size"}
+              label={"Maat"}
+              title={"maat"}
+              items={sizes}
+              value={size}
+              setValue={setSize}
+            />
+            <Dropdown
+              name={"sex"}
+              label={"Geslacht"}
+              title={"geslacht"}
+              items={sexes}
+              value={sex}
+              setValue={setSex}
+            />
+            <Dropdown
+              name={"job"}
+              label={"Functie"}
+              title={"job"}
+              items={jobs}
+              value={job}
+              setValue={setJob}
+            />
+            <h3 className="text-xl font-bold mb-1">Vereniging</h3>
+            <div className="relative">
+              <label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500 z-10">
+                Vereniging
+              </label>
+              <FilteredDropdown
+                title={"vereniging"}
+                items={unions}
+                value={unionId}
+                setValue={(value) => {
+                  const selectedUnion = unions.find(
+                    (union) => union.id.toString() === value,
+                  );
+                  if (selectedUnion) {
+                    setUnionId(selectedUnion.id.toString()); // Make sure to set as string
+                  } else {
+                    setUnionId(""); // Handle the case when no value is selected
+                  }
+                }}
+              />
+              <div className="flex items-center">
+                <label className="mr-2">Vrijdag & zaterdag aanwezig?</label>
+                <input
+                  type="checkbox"
+                  name={"quantity"}
+                  checked={quantity === 2}
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.checked ? 2 : 1)}
+                  className="rounded-xl border border-solid border-gray-300 h-12 sm:h-14 w-4 sm:w-4 px-4 sm:px-5"
+                />
+              </div>
+            </div>
+          </div>
         </div>
         {isUserMade && (
           <div className="flex justify-end text-2xl text-green-400">
@@ -397,6 +388,20 @@ const Usermodal = ({
             )}
           </div>
         )}
+      </div>
+      <div className="flex flex-row items-baseline justify-center">
+        <Button
+          className="bg-gladiolentext text-white mr-1"
+          type="button"
+          onClick={handleUser}>
+          {userId ? "Bewerken" : "Aanmaken"}
+        </Button>
+        <Button
+          className="bg-red-500 text-white"
+          type="button"
+          onClick={onClose}>
+          Annuleren
+        </Button>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Button from "../Button";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "../../providers/context";
-import { useAuthStore } from "@/app/store/authStore";
+import { useAuthStore } from "@/app/stores/authStore";
 import { jwtDecode } from "jwt-decode";
 
 interface TokenOTPmodalProps {

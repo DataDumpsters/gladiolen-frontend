@@ -1,24 +1,29 @@
 import React from "react";
 import Button from "@/app/components/Button";
-import { useUserStore } from "@/app/store/userStore";
 import fetchWithAuth from "@/app/utils/fetchWithAuth";
 
 interface ConfirmdeletemodalProps {
   onClose: () => void;
-  userId: number;
+  id: number;
+  removeFunction: (id: number) => void;
+  label: string;
+  link: string;
+  options?: RequestInit;
 }
 
-const Confirmdeletemodal = ({ onClose, userId }: ConfirmdeletemodalProps) => {
-  const removeUser = useUserStore((state) => state.removeUser);
-
+const Confirmdeletemodal = ({
+  onClose,
+  id,
+  removeFunction,
+  label,
+  link,
+  options = {},
+}: ConfirmdeletemodalProps) => {
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetchWithAuth(
-        `http://localhost:8080/admin/user/${id}`,
-        // Ensure the token is not null or undefined
-      );
+      const response = await fetchWithAuth(link, options);
       if (response.ok) {
-        removeUser(id);
+        removeFunction(id);
         onClose();
       }
     } catch (error) {
@@ -33,13 +38,11 @@ const Confirmdeletemodal = ({ onClose, userId }: ConfirmdeletemodalProps) => {
   return (
     <div>
       <h2 className="text-xl font-bold mb-2">Bevestig verwijdering</h2>
-      <p className="mb-4">
-        Weet je zeker dat je deze gebruiker wil verwijderen?
-      </p>
+      <p className="mb-4">Weet je zeker dat je deze {label} wil verwijderen?</p>
       <div className="flex justify-center">
         <Button
           className="bg-gladiolentext text-white mr-1"
-          onClick={() => handleDelete(userId)}>
+          onClick={() => handleDelete(id)}>
           Bevestigen
         </Button>
         <Button className="bg-red-500 text-white" onClick={onClose}>

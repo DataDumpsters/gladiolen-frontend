@@ -1,11 +1,12 @@
 "use client";
 
-import { useAuthStore } from "@/app/store/authStore";
+import { useAuthStore } from "@/app/stores/authStore";
 import { PencilIcon, TrashIcon } from "@heroicons/react/20/solid";
 import React, { useState } from "react";
 import Modal from "@/app/components/Modal";
 import Confirmdeletemodal from "@/app/components/modals/Confirmdeletemodal";
 import Usermodal from "@/app/components/modals/Usermodal";
+import { useUserStore } from "@/app/stores/userStore";
 
 interface UserTableProps {
   roles: Role[];
@@ -42,27 +43,15 @@ const UsersTable = ({
     const aValue =
       sortColumn === "union"
         ? (a.union?.name ?? "")
-        : (a[sortColumn as keyof User] ?? "");
+        : ((a[sortColumn as keyof User] ?? "") as string);
     const bValue =
       sortColumn === "union"
         ? (b.union?.name ?? "")
-        : (b[sortColumn as keyof User] ?? "");
+        : ((b[sortColumn as keyof User] ?? "") as string);
     if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
     if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
-
-  if (!isHydrated) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (users.length === 0) {
-    return <p>Geen medewerkers gevonden.</p>;
-  }
 
   const headers = [
     { label: "Voornaam", key: "firstName" },
@@ -77,63 +66,74 @@ const UsersTable = ({
 
   return (
     <div>
-      <table className="min-w-full bg-white">
-        <thead className={"bg-gladiolentext text-white"}>
-          <tr>
-            {headers.map((header) => (
-              <th
-                key={header.key}
-                className="py-2 px-4 border-b border-gray-200 cursor-pointer"
-                onClick={() => handleSort(header.key)}>
-                {header.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {sortedUsers.map((user) => (
-            <tr key={user.id} className={"text-center"}>
-              <td>{user.firstName}</td>
-              <td>{user.lastName}</td>
-              <td>{user.union?.name || "Geen vereniging toegewezen"}</td>
-              <td>{user.tshirt?.size}</td>
-              <td>{user.tshirt?.sex}</td>
-              <td>{user.tshirt?.job}</td>
-              {/*<td>{user.tshirt?.quantity}</td>*/}
-              <td className={"flex justify-center items-center"}>
-                <div className="flex justify-center items-center">
-                  <PencilIcon
-                    className="h-6 w-6 text-green-400"
-                    onClick={() => {
-                      setSelectedUserId(user.id);
-                      setIsUsermodalOpen(true);
-                    }}
-                  />
-                </div>
-              </td>
-              <td>
-                <div className="flex justify-center items-center">
-                  {user.role !== "Admin" ? (
-                    <TrashIcon
-                      className="h-6 w-6 text-red-500"
+      {!isHydrated ? (
+        <div className="flex justify-center items-center h-screen">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+        </div>
+      ) : users.length === 0 ? (
+        <p>Geen medewerkers gevonden.</p>
+      ) : (
+        <table className="min-w-full bg-white">
+          <thead className={"bg-gladiolentext text-white"}>
+            <tr>
+              {headers.map((header) => (
+                <th
+                  key={header.key}
+                  className="py-2 px-4 border-b border-gray-200 cursor-pointer"
+                  onClick={() => handleSort(header.key)}>
+                  {header.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {sortedUsers.map((user) => (
+              <tr key={user.id} className={"text-center"}>
+                <td>{user.firstName}</td>
+                <td>{user.lastName}</td>
+                <td>{user.union?.name || "Geen vereniging toegewezen"}</td>
+                <td>{user.tshirt?.size}</td>
+                <td>{user.tshirt?.sex}</td>
+                <td>{user.tshirt?.job}</td>
+                {/*<td>{user.tshirt?.quantity}</td>*/}
+                <td className={"flex justify-center items-center"}>
+                  <div className="flex justify-center items-center">
+                    <PencilIcon
+                      className="h-6 w-6 text-green-400"
                       onClick={() => {
                         setSelectedUserId(user.id);
-                        setIsDeleteModalOpen(true);
+                        setIsUsermodalOpen(true);
                       }}
                     />
-                  ) : (
-                    <span className="h-6 w-6 inline-block"></span>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  </div>
+                </td>
+                <td>
+                  <div className="flex justify-center items-center">
+                    {user.role !== "Admin" ? (
+                      <TrashIcon
+                        className="h-6 w-6 text-red-500"
+                        onClick={() => {
+                          setSelectedUserId(user.id);
+                          setIsDeleteModalOpen(true);
+                        }}
+                      />
+                    ) : (
+                      <span className="h-6 w-6 inline-block"></span>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       <Modal isOpen={isDeleteModalOpen}>
         <Confirmdeletemodal
           onClose={() => setIsDeleteModalOpen(false)}
-          userId={selectedUserId}
+          id={selectedUserId}
+          removeFunction={useUserStore((state) => state.removeUser)}
+          label="gebruiker"
+          link={`http://localhost:8080/admin/user/${selectedUserId}`}
         />
       </Modal>
       <Modal isOpen={isUsermodalOpen}>

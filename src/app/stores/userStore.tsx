@@ -7,7 +7,7 @@ interface UserStore {
   addUser: (user: User) => void;
   updateUser: (user: User) => void;
   removeUser: (id: number) => void;
-  fetchUsers: (token: string | null) => Promise<User[]>;
+  fetchUsers: () => Promise<User[]>;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -25,7 +25,7 @@ export const useUserStore = create<UserStore>((set) => ({
     set((state) => ({
       users: state.users.map((u) => (u.id === user.id ? user : u)),
     })),
-  fetchUsers: async (token) => {
+  fetchUsers: async () => {
     try {
       const response = await fetchWithAuth("http://localhost:8080/user/all");
       if (response.ok) {
