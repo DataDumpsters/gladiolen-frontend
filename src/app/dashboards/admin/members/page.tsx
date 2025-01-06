@@ -6,8 +6,8 @@ import Usermodal from "@/app/components/modals/Usermodal";
 import Button from "@/app/components/Button";
 import useFetchData from "@/app/hooks/useFetchData";
 import UsersTable from "@/app/components/UsersTable";
-import { useUserStore } from "@/app/store/userStore";
-import { useAuthStore } from "@/app/store/authStore";
+import { useUserStore } from "@/app/stores/userStore";
+import { useAuthStore } from "@/app/stores/authStore";
 import Inputfield from "@/app/components/Inputfield";
 
 const AdminMembersPage = () => {
@@ -26,7 +26,7 @@ const AdminMembersPage = () => {
 
   useEffect(() => {
     if (accessToken) {
-      fetchUsers(accessToken);
+      fetchUsers();
     }
   }, [accessToken, fetchUsers]);
 
@@ -45,7 +45,11 @@ const AdminMembersPage = () => {
   }
 
   if (!isHydrated) {
-    return <div>Loading...</div>; // Optionally show a loading indicator
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+      </div>
+    );
   }
 
   return (
@@ -75,7 +79,7 @@ const AdminMembersPage = () => {
           />
         </div>
       </div>
-      <Modal isOpen={registerModalOpen}>
+      <Modal isOpen={registerModalOpen} width={"w-1/2"}>
         <Usermodal
           onClose={() => setRegisterModalOpen(false)}
           roles={roles}

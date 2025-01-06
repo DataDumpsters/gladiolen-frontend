@@ -100,7 +100,7 @@
 
 import React, { useState } from "react";
 import Button from "../Button";
-import { useAuthStore } from "@/app/store/authStore";
+import { useAuthStore } from "@/app/stores/authStore";
 
 interface ForgotpasswordmodalProps {
   onClose: (e: React.MouseEvent<HTMLButtonElement>) => void;

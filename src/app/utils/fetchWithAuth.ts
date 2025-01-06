@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/app/store/authStore";
+import { useAuthStore } from "@/app/stores/authStore";
 
 const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
   const { accessToken, isTokenExpired, refreshAccessToken } =
