@@ -7,7 +7,6 @@ const AdminHome = () => {
   return (
     <Layout>
       <h1>Welkom bij het dashboard voor admins</h1>{" "}
-      {/* You can replace this with your actual content */}
     </Layout>
   );
 };
