@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuthStore } from "@/app/store/authStore";
+import { useAuthStore } from "@/app/stores/authStore";
 import fetchWithAuth from "@/app/utils/fetchWithAuth";
 
 const useFetchData = () => {

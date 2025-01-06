@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import Button from "@/app/components/Button";
 import Inputfield from "@/app/components/Inputfield";
-import { useAuthStore } from "@/app/store/authStore";
-import { useTshirtStore } from "@/app/store/tshirtStore";
+import { useAuthStore } from "@/app/stores/authStore";
+import { useTshirtStore } from "@/app/stores/tshirtStore";
 import Dropdown from "@/app/components/Dropdown";
 import FilteredDropdown from "@/app/components/FilteredDropdown";
 import fetchWithAuth from "@/app/utils/fetchWithAuth";
