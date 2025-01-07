@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import fetchWithAuth from "@/app/utils/fetchWithAuth";
+import { Tshirt } from "@/app/models/Tshirt";
 
 interface TshirtStore {
   tshirts: Tshirt[];
