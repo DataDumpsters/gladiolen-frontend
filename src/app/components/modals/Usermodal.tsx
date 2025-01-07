@@ -8,6 +8,7 @@ import { useUserStore } from "@/app/stores/userStore";
 import Dropdown from "@/app/components/Dropdown";
 import FilteredDropdown from "@/app/components/FilteredDropdown";
 import fetchWithAuth from "@/app/utils/fetchWithAuth";
+import { Union } from "@/app/models/Union";
 
 interface UsermodalProps {
   onClose: () => void;
