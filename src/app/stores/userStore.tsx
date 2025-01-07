@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import fetchWithAuth from "@/app/utils/fetchWithAuth";
+import { User } from "../models/User";
 
 interface UserStore {
   users: User[];

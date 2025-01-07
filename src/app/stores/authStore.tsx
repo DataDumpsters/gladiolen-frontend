@@ -5,6 +5,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import SecureLS from "secure-ls";
 import { jwtDecode } from "jwt-decode";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+import { User } from "@/app/models/User";
 
 let ls: SecureLS | null = null;
 
@@ -15,11 +16,14 @@ if (typeof window !== "undefined") {
 interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
+  user: User | null;
   isHydrated: boolean;
   setToken: (accessToken: string, refreshToken: string) => void;
   clearTokens: () => void;
   isTokenExpired: () => boolean;
   refreshAccessToken: () => Promise<string | null>;
+  getUser: () => User | null;
+  fetchUser: () => Promise<User | null>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -27,17 +31,50 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       accessToken: null,
       refreshToken: null,
+      user: null,
       isHydrated: false,
-      setToken: (accessToken: string, refreshToken: string) => {
-        if (!accessToken || !refreshToken) return; // Ensure the token is not null or undefined
-        set({
-          accessToken, // Save the raw token, do not manipulate or stringify
-          refreshToken, // Save the raw token, do not manipulate or stringify
-          isHydrated: true,
-        });
+      setToken: async (accessToken: string, refreshToken: string) => {
+        if (!accessToken || !refreshToken) return;
+        try {
+          const decoded: { user_id: number } = jwtDecode(accessToken);
+          console.log("Decoded user ID:", decoded.user_id);
+
+          // Fetch the complete user object from the backend
+          const response = await fetch(
+            `http://localhost:8080/user/${decoded.user_id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            },
+          );
+
+          if (response.ok) {
+            const user: User = await response.json();
+            console.log("Fetched user:", user);
+            set({
+              accessToken,
+              refreshToken,
+              user,
+              isHydrated: true,
+            });
+          } else {
+            console.error("Failed to fetch user details");
+          }
+        } catch (error) {
+          console.error(
+            "Error decoding token or fetching user details:",
+            error,
+          );
+        }
       },
       clearTokens: () => {
-        set({ accessToken: null, refreshToken: null, isHydrated: false });
+        set({
+          accessToken: null,
+          refreshToken: null,
+          user: null,
+          isHydrated: false,
+        });
         if (ls) {
           ls.remove("auth-storage");
         }
@@ -71,6 +108,37 @@ export const useAuthStore = create<AuthState>()(
             return null;
           }
         } catch (error) {
+          return null;
+        }
+      },
+      getUser: () => {
+        const { user } = get();
+        return user;
+      },
+      fetchUser: async () => {
+        const { accessToken } = get();
+        if (!accessToken) return null;
+        try {
+          const decoded: { user_id: number } = jwtDecode(accessToken);
+          const response = await fetch(
+            `http://localhost:8080/user/${decoded.user_id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            },
+          );
+
+          if (response.ok) {
+            const user: User = await response.json();
+            set({ user });
+            return user;
+          } else {
+            console.error("Failed to fetch user details");
+            return null;
+          }
+        } catch (error) {
+          console.error("Error fetching user details:", error);
           return null;
         }
       },

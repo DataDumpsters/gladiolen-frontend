@@ -9,16 +9,19 @@ import UsersTable from "@/app/components/UsersTable";
 import { useUserStore } from "@/app/stores/userStore";
 import { useAuthStore } from "@/app/stores/authStore";
 import Inputfield from "@/app/components/Inputfield";
+import { useUnionStore } from "@/app/stores/unionStore";
 
 const AdminMembersPage = () => {
   const [isClient, setIsClient] = useState(false);
-  const { accessToken, isHydrated } = useAuthStore();
+  const { accessToken, isHydrated, getUser } = useAuthStore();
   const { roles, sizes, sexes, jobs, unions } = useFetchData();
   const users = useUserStore((state) => state.users);
   const fetchUsers = useUserStore((state) => state.fetchUsers);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [adminRole, setAdminRole] = useState(false);
+  const { filteredUnion, setFilteredUnion } = useUnionStore();
+  const user = getUser();
 
   useEffect(() => {
     setIsClient(true);
@@ -32,8 +35,9 @@ const AdminMembersPage = () => {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()),
+      (user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.lastName.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (!filteredUnion || user.union?.id === filteredUnion.id),
   );
 
   const displayedUsers = adminRole
@@ -54,21 +58,32 @@ const AdminMembersPage = () => {
 
   return (
     <div>
+      <h1 className="text-white text-4xl my-4">Medewerkers</h1>
       <div className={"flex justify-between items-baseline"}>
         <Button
           className="text-white py-2 bg-gladiolentext mb-2"
           onClick={() => setRegisterModalOpen(true)}>
           Medewerker aanmaken
         </Button>
-        <label className={"text-white ml-4"}>
-          Admin?
-          <input
-            type="checkbox"
-            checked={adminRole}
-            onChange={() => setAdminRole(!adminRole)}
-            className={"ml-2"}
-          />
-        </label>
+        {user?.role === "Admin" && (
+          <label className={"text-white ml-4"}>
+            Admin?
+            <input
+              type="checkbox"
+              checked={adminRole}
+              onChange={() => setAdminRole(!adminRole)}
+              className={"ml-2"}
+            />
+          </label>
+        )}
+        {filteredUnion && (
+          <Button
+            className="text-white py-2 bg-gladiolentext mb-2 ml-2"
+            onClick={() => setFilteredUnion(null)}>
+            {filteredUnion.name} ({filteredUnion.users?.length}) leden - Filter
+            wissen
+          </Button>
+        )}
         <div className="flex-grow ml-4">
           <Inputfield
             name={"Userfilter"}

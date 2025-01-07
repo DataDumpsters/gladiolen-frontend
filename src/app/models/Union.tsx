@@ -1,4 +1,6 @@
-interface Union {
+import { User } from "@/app/models/User";
+
+export interface Union {
   id: number;
   name: string;
   address: string;

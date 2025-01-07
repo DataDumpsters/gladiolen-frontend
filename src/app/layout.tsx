@@ -21,7 +21,7 @@ const RootLayout = ({ children }: RootLayoutProps) => {
           <main className="flex-grow flex items-center justify-center">
             {children}
           </main>
-          <footer className="footer flex-none w-full text-right pr-2">
+          <footer className="footer flex-none w-full text-right pr-2 text-white">
             <p>&copy; 2024 GladiolenRegister - Data Dumpsters</p>
           </footer>
         </AppProvider>

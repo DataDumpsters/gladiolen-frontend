@@ -10,9 +10,10 @@ import { useUnionStore } from "@/app/stores/unionStore";
 interface UnionmodalProps {
   onClose: () => void;
   unionId?: number;
+  onUnionUpdate?: () => void;
 }
 
-const Unionmodal = ({ onClose, unionId }: UnionmodalProps) => {
+const Unionmodal = ({ onClose, unionId, onUnionUpdate }: UnionmodalProps) => {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [postalCode, setPostalCode] = useState("");
@@ -153,12 +154,6 @@ const Unionmodal = ({ onClose, unionId }: UnionmodalProps) => {
           ? `http://localhost:8080/api/union/${unionId}`
           : `http://localhost:8080/api/union`;
         const method = unionId ? "PUT" : "POST";
-        const body = JSON.stringify(payload);
-
-        const options = {
-          method: method,
-          body: body,
-        };
 
         const response = await fetch(url, {
           method: method,
@@ -172,6 +167,9 @@ const Unionmodal = ({ onClose, unionId }: UnionmodalProps) => {
         if (response.ok) {
           setIsUnionMade(true);
           await fetchUnions();
+          if (onUnionUpdate) {
+            onUnionUpdate(); // Call the update handler if provided
+          }
           onClose();
         } else {
           const errorMessage = await response.text();

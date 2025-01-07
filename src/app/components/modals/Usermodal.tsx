@@ -45,6 +45,9 @@ const Usermodal = ({
   const [isUserMade, setIsUserMade] = useState(false);
   const token = useAuthStore((state) => state.accessToken);
   const fetchUsers = useUserStore((state) => state.fetchUsers);
+  const { getUser } = useAuthStore();
+  const user = getUser();
+  const userRole = user?.role;
 
   useEffect(() => {
     if (userId) {
@@ -79,6 +82,9 @@ const Usermodal = ({
       };
 
       fetchUserData();
+    } else if (userRole !== "Admin") {
+      // Set unionId to the logged-in user's union ID if the user is not an admin
+      setUnionId(user?.union?.id.toString() || "");
     }
   }, [userId]);
 
@@ -347,24 +353,28 @@ const Usermodal = ({
             />
             <h3 className="text-xl font-bold mb-1">Vereniging</h3>
             <div className="relative">
-              <label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500 z-10">
-                Vereniging
-              </label>
-              <FilteredDropdown
-                title={"vereniging"}
-                items={unions}
-                value={unionId}
-                setValue={(value) => {
-                  const selectedUnion = unions.find(
-                    (union) => union.id.toString() === value,
-                  );
-                  if (selectedUnion) {
-                    setUnionId(selectedUnion.id.toString()); // Make sure to set as string
-                  } else {
-                    setUnionId(""); // Handle the case when no value is selected
-                  }
-                }}
-              />
+              {userRole === "Admin" && (
+                <div>
+                  <label className="absolute -top-2 left-2 bg-white px-1 text-xs text-gray-500 z-10">
+                    Vereniging
+                  </label>
+                  <FilteredDropdown
+                    title={"vereniging"}
+                    items={unions}
+                    value={unionId}
+                    setValue={(value) => {
+                      const selectedUnion = unions.find(
+                        (union) => union.id.toString() === value,
+                      );
+                      if (selectedUnion) {
+                        setUnionId(selectedUnion.id.toString()); // Make sure to set as string
+                      } else {
+                        setUnionId(""); // Handle the case when no value is selected
+                      }
+                    }}
+                  />
+                </div>
+              )}
               <div className="flex items-center">
                 <label className="mr-2">Vrijdag & zaterdag aanwezig?</label>
                 <input
