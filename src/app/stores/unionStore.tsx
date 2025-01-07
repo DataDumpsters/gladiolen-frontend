@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import fetchWithAuth from "@/app/utils/fetchWithAuth";
+import { Union } from "@/app/models/Union";
 
 interface UnionStore {
   unions: Union[];

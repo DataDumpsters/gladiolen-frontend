@@ -9,24 +9,23 @@ import UsersTable from "@/app/components/UsersTable";
 import { useUserStore } from "@/app/stores/userStore";
 import { useAuthStore } from "@/app/stores/authStore";
 import Inputfield from "@/app/components/Inputfield";
-import { useUnionStore } from "@/app/stores/unionStore";
 import { useLinkStore } from "@/app/stores/linkStore";
 import { User } from "@/app/models/User";
+import Unionmodal from "@/app/components/modals/Unionmodal";
 
-const AdminMembersPage = () => {
+const UnionMembersPage = () => {
   const [isClient, setIsClient] = useState(false);
-  const { accessToken, isHydrated, getUser } = useAuthStore();
+  const { accessToken, isHydrated, getUser, fetchUser } = useAuthStore();
   const { roles, sizes, sexes, jobs, unions } = useFetchData();
   const users = useUserStore((state) => state.users);
   const fetchUsers = useUserStore((state) => state.fetchUsers);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [adminRole, setAdminRole] = useState(false);
-  const { filteredUnion, setFilteredUnion } = useUnionStore();
-  const user: User | null = getUser();
+  const [user, setUser] = useState<User | null>(getUser());
   const { setActiveRoute } = useLinkStore() as {
     setActiveRoute: (route: string) => void;
   }; // Get active route and the setter function from Zustand store
+  const [isUnionmodalOpen, setIsUnionmodalOpen] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -39,6 +38,11 @@ const AdminMembersPage = () => {
       fetchUsers();
     }
   }, [accessToken, fetchUsers]);
+
+  const handleUnionUpdate = async () => {
+    await fetchUser(); // Refetch user data
+    setUser(getUser()); // Update the state with the new user data
+  };
 
   const filteredUsers = users.filter(
     (user) =>
@@ -61,24 +65,55 @@ const AdminMembersPage = () => {
 
   return (
     <div>
-      <h1 className="text-white text-4xl my-4">Vereniging</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-white text-4xl my-4">Vereniging</h1>
+        <Button
+          className="text-white py-2 bg-gladiolentext mb-2 ml-2"
+          onClick={() => {
+            setIsUnionmodalOpen(true);
+          }}>
+          Vereniging bewerken
+        </Button>
+      </div>
       <div>
-        <h2 className="text-white text-2xl my-2">Naam</h2>
-        <p className="text-white text-lg">{user?.union?.name}</p>
-        <h2 className="text-white text-2xl my-2">Adres</h2>
-        <p className="text-white text-lg">{user?.union?.address}</p>
-        <h2 className="text-white text-2xl my-2">Postcode</h2>
-        <p className="text-white text-lg">{user?.union?.postalCode}</p>
-        <h2 className="text-white text-2xl my-2">Gemeente</h2>
-        <p className="text-white text-lg">{user?.union?.municipality}</p>
-        <h2 className="text-white text-2xl my-2">BTW-nummer</h2>
-        <p className="text-white text-lg">{user?.union?.vatNumber}</p>
-        <h2 className="text-white text-2xl my-2">Rekeningnummer</h2>
-        <p className="text-white text-lg">{user?.union?.accountNumber}</p>
-        <h2 className="text-white text-2xl my-2">Aantal parkeertickets</h2>
-        <p className="text-white text-lg">
-          {user?.union?.numberOfParkingTickets}
-        </p>
+        <div className="flex justify-between items-center">
+          <h2 className="text-white text-xl my-2">Naam</h2>
+          <p className="text-white text-xl">{user?.union?.name}</p>
+        </div>
+        <div className="flex justify-between items-center">
+          <h2 className="text-white text-xl my-2">Adres</h2>
+          <p className="text-white text-xl">{user?.union?.address}</p>
+        </div>
+        <div className="flex justify-between items-center">
+          <h2 className="text-white text-xl my-2">Postcode</h2>
+          <p className="text-white text-xl">{user?.union?.postalCode}</p>
+        </div>
+        <div className="flex justify-between items-center">
+          <h2 className="text-white text-xl my-2">Gemeente</h2>
+          <p className="text-white text-xl">{user?.union?.municipality}</p>
+        </div>
+        <div className="flex justify-between items-center">
+          <h2 className="text-white text-xl my-2">BTW-nummer</h2>
+          <p className="text-white text-xl">{user?.union?.vatNumber}</p>
+        </div>
+        <div className="flex justify-between items-center">
+          <h2 className="text-white text-xl my-2">Rekeningnummer</h2>
+          <p className="text-white text-xl">{user?.union?.accountNumber}</p>
+        </div>
+        <div className="flex justify-between items-center">
+          <h2 className="text-white text-xl my-2">Aantal parkeertickets</h2>
+          <p className="text-white text-xl">
+            {user?.union?.numberOfParkingTickets}
+          </p>
+        </div>
+
+        <Modal isOpen={isUnionmodalOpen}>
+          <Unionmodal
+            onClose={() => setIsUnionmodalOpen(false)}
+            unionId={user?.union?.id}
+            onUnionUpdate={handleUnionUpdate}
+          />
+        </Modal>
       </div>
       <h1 className="text-white text-4xl my-4">Medewerkers</h1>
       <div className={"flex justify-between items-baseline"}>
@@ -87,34 +122,17 @@ const AdminMembersPage = () => {
           onClick={() => setRegisterModalOpen(true)}>
           Medewerker aanmaken
         </Button>
-        {user?.role === "Admin" && (
-          <label className={"text-white ml-4"}>
-            Admin?
-            <input
-              type="checkbox"
-              checked={adminRole}
-              onChange={() => setAdminRole(!adminRole)}
-              className={"ml-2"}
+        {!isUnionmodalOpen && (
+          <div className="flex-grow ml-4">
+            <Inputfield
+              name={"Userfilter"}
+              placeholder={"Zoek op voornaam of achternaam"}
+              value={searchTerm}
+              setValue={setSearchTerm}
+              className={"flex-grow"}
             />
-          </label>
+          </div>
         )}
-        {filteredUnion && (
-          <Button
-            className="text-white py-2 bg-gladiolentext mb-2 ml-2"
-            onClick={() => setFilteredUnion(null)}>
-            {filteredUnion.name} ({filteredUnion.users?.length}) leden - Filter
-            wissen
-          </Button>
-        )}
-        <div className="flex-grow ml-4">
-          <Inputfield
-            name={"Userfilter"}
-            placeholder={"Zoek op voornaam of achternaam"}
-            value={searchTerm}
-            setValue={setSearchTerm}
-            className={"flex-grow"}
-          />
-        </div>
       </div>
       <Modal isOpen={registerModalOpen} width={"w-1/2"}>
         <Usermodal
@@ -138,4 +156,4 @@ const AdminMembersPage = () => {
   );
 };
 
-export default AdminMembersPage;
+export default UnionMembersPage;

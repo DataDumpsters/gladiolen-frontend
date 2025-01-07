@@ -7,6 +7,8 @@ import Modal from "@/app/components/Modal";
 import Confirmdeletemodal from "@/app/components/modals/Confirmdeletemodal";
 import Usermodal from "@/app/components/modals/Usermodal";
 import { useUserStore } from "@/app/stores/userStore";
+import { User } from "@/app/models/User";
+import { Union } from "@/app/models/Union";
 
 interface UserTableProps {
   roles: Role[];
@@ -62,6 +64,9 @@ const UsersTable = ({
     { label: "Voornaam", key: "firstName" },
     { label: "Achternaam", key: "lastName" },
     ...(userRole === "Admin" ? [{ label: "Vereniging", key: "union" }] : []),
+    ...(userRole === "Hoofdverantwoordelijke"
+      ? [{ label: "Rol", key: "role" }]
+      : []),
     { label: "Maat", key: "tshirt.size" },
     { label: "Geslacht", key: "tshirt.sex" },
     { label: "Functie", key: "tshirt.job" },
@@ -99,6 +104,7 @@ const UsersTable = ({
                 {userRole === "Admin" && (
                   <td>{user.union?.name || "Geen vereniging toegewezen"}</td>
                 )}
+                {userRole === "Hoofdverantwoordelijke" && <td>{user.role}</td>}
                 <td>{user.tshirt?.size}</td>
                 <td>{user.tshirt?.sex}</td>
                 <td>{user.tshirt?.job}</td>

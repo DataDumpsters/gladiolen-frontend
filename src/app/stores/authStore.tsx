@@ -23,6 +23,7 @@ interface AuthState {
   isTokenExpired: () => boolean;
   refreshAccessToken: () => Promise<string | null>;
   getUser: () => User | null;
+  fetchUser: () => Promise<User | null>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -113,6 +114,33 @@ export const useAuthStore = create<AuthState>()(
       getUser: () => {
         const { user } = get();
         return user;
+      },
+      fetchUser: async () => {
+        const { accessToken } = get();
+        if (!accessToken) return null;
+        try {
+          const decoded: { user_id: number } = jwtDecode(accessToken);
+          const response = await fetch(
+            `http://localhost:8080/user/${decoded.user_id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            },
+          );
+
+          if (response.ok) {
+            const user: User = await response.json();
+            set({ user });
+            return user;
+          } else {
+            console.error("Failed to fetch user details");
+            return null;
+          }
+        } catch (error) {
+          console.error("Error fetching user details:", error);
+          return null;
+        }
       },
     }),
     {

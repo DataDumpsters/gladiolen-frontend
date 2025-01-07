@@ -10,6 +10,7 @@ import Unionmodal from "@/app/components/modals/Unionmodal";
 import Link from "next/link";
 import { useAppContext } from "@/app/providers/context";
 import { useLinkStore } from "@/app/stores/linkStore";
+import { Union } from "@/app/models/Union";
 
 interface UnionTableProps {
   unions: Union[];
