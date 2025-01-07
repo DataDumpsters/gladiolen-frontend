@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Layout from "@/app/dashboards/admin/layout";
+import Layout from "@/app/dashboards/layout";
 
 const AdminHome = () => {
   return (

@@ -44,6 +44,7 @@ const AdminUnionsPage = () => {
 
   return (
     <div>
+      <h1 className="text-white text-4xl my-4">Verenigingen</h1>
       <div className={"flex justify-between items-baseline"}>
         <Button
           className="text-white py-2 bg-gladiolentext mb-2"

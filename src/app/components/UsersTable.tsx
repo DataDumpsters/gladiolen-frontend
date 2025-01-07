@@ -30,7 +30,8 @@ const UsersTable = ({
   const [selectedUserId, setSelectedUserId] = useState(0);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const { isHydrated } = useAuthStore();
+  const { isHydrated, getUser } = useAuthStore();
+  const userRole = getUser()?.role;
 
   useEffect(() => {
     handleSort(users[0] ? Object.keys(users[0])[0] : "");
@@ -60,7 +61,7 @@ const UsersTable = ({
   const headers = [
     { label: "Voornaam", key: "firstName" },
     { label: "Achternaam", key: "lastName" },
-    { label: "Vereniging", key: "union" },
+    ...(userRole === "Admin" ? [{ label: "Vereniging", key: "union" }] : []),
     { label: "Maat", key: "tshirt.size" },
     { label: "Geslacht", key: "tshirt.sex" },
     { label: "Functie", key: "tshirt.job" },
@@ -95,7 +96,9 @@ const UsersTable = ({
               <tr key={user.id} className={"text-center space-y-2"}>
                 <td>{user.firstName}</td>
                 <td>{user.lastName}</td>
-                <td>{user.union?.name || "Geen vereniging toegewezen"}</td>
+                {userRole === "Admin" && (
+                  <td>{user.union?.name || "Geen vereniging toegewezen"}</td>
+                )}
                 <td>{user.tshirt?.size}</td>
                 <td>{user.tshirt?.sex}</td>
                 <td>{user.tshirt?.job}</td>
@@ -138,6 +141,7 @@ const UsersTable = ({
           removeFunction={useUserStore((state) => state.removeUser)}
           label="gebruiker"
           link={`http://localhost:8080/admin/user/${selectedUserId}`}
+          options={{ method: "DELETE" }}
         />
       </Modal>
       <Modal isOpen={isUsermodalOpen}>

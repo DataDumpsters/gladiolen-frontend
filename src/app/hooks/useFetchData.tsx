@@ -10,7 +10,8 @@ const useFetchData = () => {
   const [unions, setUnions] = useState([]);
   const [tshirts, setTshirts] = useState<Tshirt[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const { accessToken } = useAuthStore();
+  const { accessToken, getUser } = useAuthStore();
+  const user = getUser();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,6 +54,16 @@ const useFetchData = () => {
       if (jobsData) setJobs(jobsData);
       if (unionsData) setUnions(unionsData);
       if (tshirtData) setTshirts(tshirtData);
+
+      if (rolesData) {
+        const filteredRoles =
+          user?.role !== "Admin"
+            ? rolesData.filter(
+                (role: string) => role !== "Admin" && role !== "Kernlid",
+              )
+            : rolesData;
+        setRoles(filteredRoles);
+      }
 
       if (usersData) {
         const usersWithoutPassword = usersData.map((user: User) => {

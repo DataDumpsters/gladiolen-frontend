@@ -21,6 +21,9 @@ const SideNav = ({ className }: { className?: string }) => {
   }; // Get active route and the setter function from Zustand store
 
   const clearTokens = useAuthStore((state) => state.clearTokens);
+  const { getUser } = useAuthStore();
+  const user = getUser();
+  const userRole = user?.role;
 
   return (
     <nav
@@ -34,60 +37,83 @@ const SideNav = ({ className }: { className?: string }) => {
         />
       </div>
 
-      <Link
-        href={`${basename}/members`}
-        onClick={() => setActiveRoute(`${basename}/members`)} // Set active route when the link is clicked
-        className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
-          activeRoute === `${basename}/members`
-            ? "bg-gladiolenbg text-white"
-            : "hover:bg-gladiolenbg hover:text-white"
-        }`}>
-        <Button className="w-full">Medewerkers</Button>
-      </Link>
+      {userRole === "Admin" && (
+        <Link
+          href={`${basename}/members`}
+          onClick={() => setActiveRoute(`${basename}/members`)} // Set active route when the link is clicked
+          className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
+            activeRoute === `${basename}/members`
+              ? "bg-gladiolenbg text-white"
+              : "hover:bg-gladiolenbg hover:text-white"
+          }`}>
+          <Button className="w-full">Medewerkers</Button>
+        </Link>
+      )}
 
-      <Link
-        href={`${basename}/tshirt`}
-        onClick={() => setActiveRoute(`${basename}/tshirt`)} // Set active route when the link is clicked
-        className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
-          activeRoute === `${basename}/tshirt`
-            ? "bg-gladiolenbg text-white"
-            : "hover:bg-gladiolenbg hover:text-white"
-        }`}>
-        <Button className="w-full">Tshirts</Button>
-      </Link>
+      {userRole === "Admin" && (
+        <Link
+          href={`${basename}/tshirt`}
+          onClick={() => setActiveRoute(`${basename}/tshirt`)} // Set active route when the link is clicked
+          className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
+            activeRoute === `${basename}/tshirt`
+              ? "bg-gladiolenbg text-white"
+              : "hover:bg-gladiolenbg hover:text-white"
+          }`}>
+          <Button className="w-full">Tshirts</Button>
+        </Link>
+      )}
 
-      <Link
-        href={`${basename}/unions`}
-        onClick={() => setActiveRoute(`${basename}/unions`)} // Set active route when the link is clicked
-        className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
-          activeRoute === `${basename}/unions`
-            ? "bg-gladiolenbg text-white"
-            : "hover:bg-gladiolenbg hover:text-white"
-        }`}>
-        <Button className="w-full">Verenigingen</Button>
-      </Link>
+      {userRole === "Admin" ? (
+        <Link
+          href={`${basename}/unions`}
+          onClick={() => setActiveRoute(`${basename}/unions`)} // Set active route when the link is clicked
+          className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
+            activeRoute === `${basename}/unions`
+              ? "bg-gladiolenbg text-white"
+              : "hover:bg-gladiolenbg hover:text-white"
+          }`}>
+          <Button className="w-full">Verenigingen</Button>
+        </Link>
+      ) : (
+        <Link
+          href={"/dashboards/hoofdverantwoordelijke/vereniging"}
+          onClick={() =>
+            setActiveRoute("/dashboards/hoofdverantwoordelijke/vereniging")
+          } // Set active route when the link is clicked
+          className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
+            activeRoute === "/dashboards/hoofdverantwoordelijke/vereniging"
+              ? "bg-gladiolenbg text-white"
+              : "hover:bg-gladiolenbg hover:text-white"
+          }`}>
+          <Button className="w-full">{user?.union?.name}</Button>
+        </Link>
+      )}
 
-      <Link
-        href={`${basename}/organisation`}
-        onClick={() => setActiveRoute(`${basename}/organisation`)} // Set active route when the link is clicked
-        className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
-          activeRoute === `${basename}/organisation`
-            ? "bg-gladiolenbg text-white"
-            : "hover:bg-gladiolenbg hover:text-white"
-        }`}>
-        <Button className="w-full">Organisatie</Button>
-      </Link>
+      {userRole === "Admin" && (
+        <Link
+          href={`${basename}/organisation`}
+          onClick={() => setActiveRoute(`${basename}/organisation`)} // Set active route when the link is clicked
+          className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
+            activeRoute === `${basename}/organisation`
+              ? "bg-gladiolenbg text-white"
+              : "hover:bg-gladiolenbg hover:text-white"
+          }`}>
+          <Button className="w-full">Organisatie</Button>
+        </Link>
+      )}
 
-      <Link
-        href={`${basename}/statistics`}
-        onClick={() => setActiveRoute(`${basename}/statistics`)} // Set active route when the link is clicked
-        className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
-          activeRoute === `${basename}/statistics`
-            ? "bg-gladiolenbg text-white"
-            : "hover:bg-gladiolenbg hover:text-white"
-        }`}>
-        <Button className="w-full">Statistieken</Button>
-      </Link>
+      {userRole === "Admin" && (
+        <Link
+          href={`${basename}/statistics`}
+          onClick={() => setActiveRoute(`${basename}/statistics`)} // Set active route when the link is clicked
+          className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
+            activeRoute === `${basename}/statistics`
+              ? "bg-gladiolenbg text-white"
+              : "hover:bg-gladiolenbg hover:text-white"
+          }`}>
+          <Button className="w-full">Statistieken</Button>
+        </Link>
+      )}
 
       <Link
         href={"/"}

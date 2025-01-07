@@ -10,6 +10,8 @@ import { useUserStore } from "@/app/stores/userStore";
 import { useAuthStore } from "@/app/stores/authStore";
 import Inputfield from "@/app/components/Inputfield";
 import { useUnionStore } from "@/app/stores/unionStore";
+import { useLinkStore } from "@/app/stores/linkStore";
+import { User } from "@/app/models/User";
 
 const AdminMembersPage = () => {
   const [isClient, setIsClient] = useState(false);
@@ -21,10 +23,15 @@ const AdminMembersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [adminRole, setAdminRole] = useState(false);
   const { filteredUnion, setFilteredUnion } = useUnionStore();
-  const user = getUser();
+  const user: User | null = getUser();
+  const { setActiveRoute } = useLinkStore() as {
+    setActiveRoute: (route: string) => void;
+  }; // Get active route and the setter function from Zustand store
 
   useEffect(() => {
     setIsClient(true);
+    setActiveRoute("dashboards/hoofdverantwoordelijke/vereniging");
+    console.log("user", user);
   }, []);
 
   useEffect(() => {
@@ -35,14 +42,10 @@ const AdminMembersPage = () => {
 
   const filteredUsers = users.filter(
     (user) =>
+      user.union?.id === getUser()?.union?.id &&
       (user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.lastName.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (!filteredUnion || user.union?.id === filteredUnion.id),
+        user.lastName.toLowerCase().includes(searchTerm.toLowerCase())),
   );
-
-  const displayedUsers = adminRole
-    ? filteredUsers.filter((user) => user.role === "Admin")
-    : filteredUsers;
 
   if (!isClient) {
     return null;
@@ -58,6 +61,25 @@ const AdminMembersPage = () => {
 
   return (
     <div>
+      <h1 className="text-white text-4xl my-4">Vereniging</h1>
+      <div>
+        <h2 className="text-white text-2xl my-2">Naam</h2>
+        <p className="text-white text-lg">{user?.union?.name}</p>
+        <h2 className="text-white text-2xl my-2">Adres</h2>
+        <p className="text-white text-lg">{user?.union?.address}</p>
+        <h2 className="text-white text-2xl my-2">Postcode</h2>
+        <p className="text-white text-lg">{user?.union?.postalCode}</p>
+        <h2 className="text-white text-2xl my-2">Gemeente</h2>
+        <p className="text-white text-lg">{user?.union?.municipality}</p>
+        <h2 className="text-white text-2xl my-2">BTW-nummer</h2>
+        <p className="text-white text-lg">{user?.union?.vatNumber}</p>
+        <h2 className="text-white text-2xl my-2">Rekeningnummer</h2>
+        <p className="text-white text-lg">{user?.union?.accountNumber}</p>
+        <h2 className="text-white text-2xl my-2">Aantal parkeertickets</h2>
+        <p className="text-white text-lg">
+          {user?.union?.numberOfParkingTickets}
+        </p>
+      </div>
       <h1 className="text-white text-4xl my-4">Medewerkers</h1>
       <div className={"flex justify-between items-baseline"}>
         <Button
@@ -105,7 +127,7 @@ const AdminMembersPage = () => {
         />
       </Modal>
       <UsersTable
-        users={displayedUsers}
+        users={filteredUsers}
         sexes={sexes}
         jobs={jobs}
         sizes={sizes}

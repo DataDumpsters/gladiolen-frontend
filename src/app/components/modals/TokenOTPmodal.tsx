@@ -47,7 +47,7 @@ const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
         const data = await response.json();
 
         // Call Zustand's setToken to persist the token
-        setAuthToken(data.accessToken, data.refreshToken);
+        await setAuthToken(data.accessToken, data.refreshToken);
         console.log("Token set successfully:", data.accessToken);
         console.log("Refresh Token set successfully:", data.refreshToken);
 
@@ -61,7 +61,9 @@ const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
 
         // Navigate based on the user role
         if (userRole === "Admin") {
-          router.push(`${basename}`);
+          router.push("/dashboards");
+        } else if (userRole === "Hoofdverantwoordelijke") {
+          router.push("/dashboards/hoofdverantwoordelijke/vereniging");
         } else {
           setMessage("No admin privileges");
         }
