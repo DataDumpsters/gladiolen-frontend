@@ -46,6 +46,17 @@ const SideNav = ({ className }: { className?: string }) => {
       </Link>
 
       <Link
+        href={`${basename}/tshirt`}
+        onClick={() => setActiveRoute(`${basename}/tshirt`)} // Set active route when the link is clicked
+        className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
+          activeRoute === `${basename}/tshirt`
+            ? "bg-gladiolenbg text-white"
+            : "hover:bg-gladiolenbg hover:text-white"
+        }`}>
+        <Button className="w-full">Tshirts</Button>
+      </Link>
+
+      <Link
         href={`${basename}/unions`}
         onClick={() => setActiveRoute(`${basename}/unions`)} // Set active route when the link is clicked
         className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
