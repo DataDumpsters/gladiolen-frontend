@@ -1,6 +1,6 @@
 import { User } from "@/app/models/User";
 
-interface Tshirt {
+export interface Tshirt {
   id: number;
   size: Size;
   sex: Sex;

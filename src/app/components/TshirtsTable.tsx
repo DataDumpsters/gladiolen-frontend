@@ -7,6 +7,7 @@ import Modal from "@/app/components/Modal";
 import Confirmdeletemodal from "@/app/components/modals/Confirmdeletemodal";
 import Tshirtmodal from "@/app/components/modals/Tshirtmodal";
 import { useTshirtStore } from "@/app/stores/tshirtStore";
+import { Tshirt } from "@/app/models/Tshirt";
 
 interface TshirtTableProps {
   sizes: Size[];
