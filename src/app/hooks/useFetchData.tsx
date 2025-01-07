@@ -8,6 +8,7 @@ const useFetchData = () => {
   const [sexes, setSexes] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [unions, setUnions] = useState([]);
+  const [tshirts, setTshirts] = useState<Tshirt[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const { accessToken } = useAuthStore();
 
@@ -40,6 +41,9 @@ const useFetchData = () => {
         "http://localhost:8080/api/tshirt/sexes",
       );
       const jobsData = await fetchJson("http://localhost:8080/api/tshirt/jobs");
+      const tshirtData = await fetchJson(
+        "http://localhost:8080/api/tshirt/counts",
+      );
       const unionsData = await fetchJson("http://localhost:8080/api/union/all");
       const usersData = await fetchJson("http://localhost:8080/user/all");
 
@@ -48,6 +52,7 @@ const useFetchData = () => {
       if (sexesData) setSexes(sexesData);
       if (jobsData) setJobs(jobsData);
       if (unionsData) setUnions(unionsData);
+      if (tshirtData) setTshirts(tshirtData);
 
       if (usersData) {
         const usersWithoutPassword = usersData.map((user: User) => {

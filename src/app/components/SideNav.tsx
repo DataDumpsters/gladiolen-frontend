@@ -81,7 +81,7 @@ const SideNav = ({ className }: { className?: string }) => {
       <Link
         href={`${basename}/statistics`}
         onClick={() => setActiveRoute(`${basename}/statistics`)} // Set active route when the link is clicked
-        className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 ${
+        className={`w-full text-center px-4 py-2 rounded-xl rounded-r-none ml-4 mb-1 ${
           activeRoute === `${basename}/statistics`
             ? "bg-gladiolenbg text-white"
             : "hover:bg-gladiolenbg hover:text-white"

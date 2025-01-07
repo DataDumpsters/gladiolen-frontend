@@ -7,6 +7,9 @@ import Modal from "@/app/components/Modal";
 import Confirmdeletemodal from "@/app/components/modals/Confirmdeletemodal";
 import { useUnionStore } from "@/app/stores/unionStore";
 import Unionmodal from "@/app/components/modals/Unionmodal";
+import Link from "next/link";
+import { useAppContext } from "@/app/providers/context";
+import { useLinkStore } from "@/app/stores/linkStore";
 
 interface UnionTableProps {
   unions: Union[];
@@ -19,6 +22,11 @@ const UnionTable = ({ unions }: UnionTableProps) => {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { isHydrated } = useAuthStore();
+  const { basename } = useAppContext();
+  const { setFilteredUnion } = useUnionStore();
+  const { setActiveRoute } = useLinkStore() as {
+    setActiveRoute: (route: string) => void;
+  };
 
   const handleSort = (column: string) => {
     const order = sortColumn === column && sortOrder === "asc" ? "desc" : "asc";
@@ -35,8 +43,14 @@ const UnionTable = ({ unions }: UnionTableProps) => {
     return 0;
   });
 
+  const handleUnionFilter = (union: Union) => {
+    setFilteredUnion(union);
+    setActiveRoute(`${basename}/members`);
+  };
+
   const headers = [
     { label: "Naam", key: "name" },
+    { label: "Aantal Leden", key: "users" },
     { label: "Adres", key: "address" },
     { label: "Postcode", key: "postalCode" },
     { label: "Gemeente", key: "municipality" },
@@ -71,8 +85,15 @@ const UnionTable = ({ unions }: UnionTableProps) => {
           </thead>
           <tbody>
             {sortedUnions.map((union) => (
-              <tr key={union.id} className={"text-center"}>
-                <td>{union.name}</td>
+              <tr key={union.id} className={"text-center space-y-2"}>
+                <td>
+                  <Link
+                    href={`${basename}/members`}
+                    onClick={() => handleUnionFilter(union)}>
+                    {union.name}
+                  </Link>
+                </td>
+                <td className="px-2">{union.users?.length}</td>
                 <td>{union.address}</td>
                 <td>{union.postalCode}</td>
                 <td>{union.municipality}</td>

@@ -2,7 +2,7 @@
 
 import { useAuthStore } from "@/app/stores/authStore";
 import { PencilIcon, TrashIcon } from "@heroicons/react/20/solid";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "@/app/components/Modal";
 import Confirmdeletemodal from "@/app/components/modals/Confirmdeletemodal";
 import Usermodal from "@/app/components/modals/Usermodal";
@@ -31,6 +31,10 @@ const UsersTable = ({
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { isHydrated } = useAuthStore();
+
+  useEffect(() => {
+    handleSort(users[0] ? Object.keys(users[0])[0] : "");
+  }, []);
 
   const handleSort = (column: string) => {
     const order = sortColumn === column && sortOrder === "asc" ? "desc" : "asc";
@@ -88,7 +92,7 @@ const UsersTable = ({
           </thead>
           <tbody>
             {sortedUsers.map((user) => (
-              <tr key={user.id} className={"text-center"}>
+              <tr key={user.id} className={"text-center space-y-2"}>
                 <td>{user.firstName}</td>
                 <td>{user.lastName}</td>
                 <td>{user.union?.name || "Geen vereniging toegewezen"}</td>

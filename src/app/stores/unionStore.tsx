@@ -3,6 +3,8 @@ import fetchWithAuth from "@/app/utils/fetchWithAuth";
 
 interface UnionStore {
   unions: Union[];
+  filteredUnion: Union | null;
+  setFilteredUnion: (union: Union | null) => void;
   setUnions: (unions: Union[]) => void;
   addUnion: (union: Union) => void;
   updateUnion: (union: Union) => void;
@@ -12,6 +14,8 @@ interface UnionStore {
 
 export const useUnionStore = create<UnionStore>((set) => ({
   unions: [],
+  filteredUnion: null,
+  setFilteredUnion: (union) => set({ filteredUnion: union }),
   setUnions: (unions) => set({ unions }),
   removeUnion: (id) =>
     set((state) => ({

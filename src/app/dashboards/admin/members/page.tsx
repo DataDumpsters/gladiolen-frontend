@@ -9,6 +9,7 @@ import UsersTable from "@/app/components/UsersTable";
 import { useUserStore } from "@/app/stores/userStore";
 import { useAuthStore } from "@/app/stores/authStore";
 import Inputfield from "@/app/components/Inputfield";
+import { useUnionStore } from "@/app/stores/unionStore";
 
 const AdminMembersPage = () => {
   const [isClient, setIsClient] = useState(false);
@@ -19,6 +20,7 @@ const AdminMembersPage = () => {
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [adminRole, setAdminRole] = useState(false);
+  const { filteredUnion, setFilteredUnion } = useUnionStore();
 
   useEffect(() => {
     setIsClient(true);
@@ -32,8 +34,9 @@ const AdminMembersPage = () => {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()),
+      (user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.lastName.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (!filteredUnion || user.union?.id === filteredUnion.id),
   );
 
   const displayedUsers = adminRole
@@ -69,6 +72,14 @@ const AdminMembersPage = () => {
             className={"ml-2"}
           />
         </label>
+        {filteredUnion && (
+          <Button
+            className="text-white py-2 bg-gladiolentext mb-2 ml-2"
+            onClick={() => setFilteredUnion(null)}>
+            {filteredUnion.name} ({filteredUnion.users?.length}) leden - Filter
+            wissen
+          </Button>
+        )}
         <div className="flex-grow ml-4">
           <Inputfield
             name={"Userfilter"}
