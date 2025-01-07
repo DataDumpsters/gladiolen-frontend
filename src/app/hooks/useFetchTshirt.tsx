@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/app/stores/authStore";
 import fetchWithAuth from "@/app/utils/fetchWithAuth";
+import { Tshirt } from "@/app/models/Tshirt";
 
 const useFetchData = () => {
   const [sizes, setSizes] = useState([]);
