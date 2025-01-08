@@ -13,6 +13,7 @@ import { useTshirtStore } from "@/app/stores/tshirtStore";
 import useFetchTshirt from "@/app/hooks/useFetchTshirt";
 import Tshirtmodal from "@/app/components/modals/Tshirtmodal";
 import TshirtsTable from "@/app/components/TshirtsTable";
+import * as XLSX from "xlsx";
 
 const AdminTshirtPage = () => {
   const [isClient, setIsClient] = useState(false);
@@ -23,6 +24,7 @@ const AdminTshirtPage = () => {
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [adminRole, setAdminRole] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -51,6 +53,35 @@ const AdminTshirtPage = () => {
   if (!isHydrated) {
     return <div>Loading...</div>; // Optionally show a loading indicator
   }
+
+  const onGetExportProduct = async (title?: string, worksheetname?: string) => {
+    try {
+      setLoading(true);
+      // Check if the action result contains data and if it's an array
+      if (tshirts && Array.isArray(tshirts)) {
+        const dataToExport = tshirts.map((pro: any) => ({
+          job: pro.job,
+          sex: pro.sex,
+          size: pro.size,
+          totalQuantity: pro.totalQuantity,
+        }));
+        // Create Excel workbook and worksheet
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils?.json_to_sheet(dataToExport);
+        XLSX.utils.book_append_sheet(workbook, worksheet, worksheetname);
+        // Save the workbook as an Excel file
+        XLSX.writeFile(workbook, `${title}.xlsx`);
+        console.log(`Exported data to ${title}.xlsx`);
+        setLoading(false);
+      } else {
+        setLoading(false);
+        console.log("#==================Export Error");
+      }
+    } catch (error: any) {
+      setLoading(false);
+      console.log("#==================Export Error", error.message);
+    }
+  };
 
   return (
     <div>
@@ -88,6 +119,11 @@ const AdminTshirtPage = () => {
         />
       </Modal>
       <TshirtsTable sexes={sexes} jobs={jobs} sizes={sizes} tshirts={tshirts} />
+      <Button
+        onClick={() => onGetExportProduct("Product", "ProductExport")}
+        className="text-white py-2 bg-gladiolentext mb-2">
+        Export Tshirts
+      </Button>
     </div>
   );
 };

@@ -80,28 +80,6 @@ const TshirtsTable = ({ sizes, sexes, jobs, tshirts }: TshirtTableProps) => {
               <td key={`size-${tshirt.id}`}>{tshirt.size}</td>
               <td key={`sex-${tshirt.id}`}>{tshirt.sex}</td>
               <td key={`quantity-${tshirt.id}`}>{tshirt.totalQuantity}</td>
-              <td className={"flex justify-center items-center"}>
-                <div className="flex justify-center items-center">
-                  <PencilIcon
-                    className="h-6 w-6 text-green-400"
-                    onClick={() => {
-                      setSelectedTshirtId(tshirt.id);
-                      setIsTshirtmodalOpen(true);
-                    }}
-                  />
-                </div>
-              </td>
-              <td>
-                <div className="flex justify-center items-center">
-                  <TrashIcon
-                    className="h-6 w-6 text-red-500"
-                    onClick={() => {
-                      setSelectedTshirtId(tshirt.id);
-                      setIsDeleteModalOpen(true);
-                    }}
-                  />
-                </div>
-              </td>
             </tr>
           ))}
         </tbody>

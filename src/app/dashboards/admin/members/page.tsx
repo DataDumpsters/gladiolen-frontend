@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Modal from "@/app/components/Modal";
 import Usermodal from "@/app/components/modals/Usermodal";
 import Button from "@/app/components/Button";
@@ -10,6 +10,8 @@ import { useUserStore } from "@/app/stores/userStore";
 import { useAuthStore } from "@/app/stores/authStore";
 import Inputfield from "@/app/components/Inputfield";
 import { useUnionStore } from "@/app/stores/unionStore";
+import fetchWithAuth from "@/app/utils/fetchWithAuth";
+import * as XLSX from "xlsx";
 
 const AdminMembersPage = () => {
   const [isClient, setIsClient] = useState(false);
@@ -22,6 +24,9 @@ const AdminMembersPage = () => {
   const [adminRole, setAdminRole] = useState(false);
   const { filteredUnion, setFilteredUnion } = useUnionStore();
   const user = getUser();
+  const [file, setFile] = useState<File | null>(null);
+  const [importSuccess, setImportSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -32,6 +37,13 @@ const AdminMembersPage = () => {
       fetchUsers();
     }
   }, [accessToken, fetchUsers]);
+
+  useEffect(() => {
+    if (importSuccess) {
+      fetchUsers();
+      setImportSuccess(false);
+    }
+  }, [importSuccess, fetchUsers]);
 
   const filteredUsers = users.filter(
     (user) =>
@@ -55,6 +67,56 @@ const AdminMembersPage = () => {
       </div>
     );
   }
+
+  const importUsersFromExcel = async (file: File) => {
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: "array" });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rawUsers = XLSX.utils.sheet_to_json(worksheet);
+
+      const users = rawUsers.map((rawUser: any) => ({
+        firstName: rawUser["First Name"],
+        lastName: rawUser["Last Name"],
+        phoneNumber: rawUser["Phone Number"],
+        role: rawUser["Role"],
+        email: rawUser["Email"],
+        password: rawUser["Password"],
+        registryNumber: rawUser["Registry Number"],
+        tshirt: {
+          size: rawUser["Tshirt Size"],
+          sex: rawUser["Tshirt Sex"],
+          job: rawUser["Tshirt Job"],
+          quantity: rawUser["Tshirt Quantity"],
+        },
+        active: true,
+      }));
+
+      await fetchWithAuth("http://localhost:8080/admin/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(users),
+      });
+
+      console.log("Users imported successfully");
+      setImportSuccess(true);
+    } catch (error) {
+      console.error("Error importing users:", error);
+    }
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      importUsersFromExcel(file);
+    }
+  };
+
+  const handleImportButtonClick = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <div>
@@ -112,6 +174,18 @@ const AdminMembersPage = () => {
         roles={roles}
         unions={unions}
       />
+      <input
+        type="file"
+        accept=".xlsx, .xls"
+        onChange={handleFileUpload}
+        ref={fileInputRef}
+        style={{ display: "none" }}
+      />
+      <Button
+        className="text-white py-2 bg-gladiolentext mb-2"
+        onClick={handleImportButtonClick}>
+        Import Users
+      </Button>
     </div>
   );
 };
