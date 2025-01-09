@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import Button from "@/app/components/Button";
 import Inputfield from "@/app/components/Inputfield";
@@ -44,6 +42,7 @@ const Usermodal = ({
   const [unionId, setUnionId] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [isUserMade, setIsUserMade] = useState(false);
+  const [isPrivacyChecked, setIsPrivacyChecked] = useState(false); // New state for privacy checkbox
   const token = useAuthStore((state) => state.accessToken);
   const fetchUsers = useUserStore((state) => state.fetchUsers);
   const { getUser } = useAuthStore();
@@ -66,8 +65,8 @@ const Usermodal = ({
             setEmail(user.email);
             setRole(user.role);
             setRegistryNumber(user.registryNumber);
-            setPassword(user.password); // Clear password fields for security
-            setCheckPassword(user.password);
+            setPassword(""); // Clear password fields for security
+            setCheckPassword("");
             setSize(user.tshirt?.size || "");
             setSex(user.tshirt?.sex || "");
             setJob(user.tshirt?.job || "");
@@ -130,8 +129,14 @@ const Usermodal = ({
 
   const checkEmailExists = async (email: string) => {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `http://localhost:8080/user/check-email?email=${email}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
       );
       if (response.ok) {
         const exists = await response.json();
@@ -160,6 +165,13 @@ const Usermodal = ({
     );
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      return;
+    }
+    if (!isPrivacyChecked) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        privacy: "Je moet akkoord gaan met de privacyverklaring",
+      }));
       return;
     }
     setErrors({});
@@ -390,6 +402,32 @@ const Usermodal = ({
             </div>
           </div>
         </div>
+        <div className="flex items-center mt-4">
+          <input
+            type="checkbox"
+            id="privacy"
+            checked={isPrivacyChecked}
+            onChange={(e) => {
+              setIsPrivacyChecked(e.target.checked);
+              if (e.target.checked) {
+                setErrors((prevErrors) => ({ ...prevErrors, privacy: "" }));
+              }
+            }}
+            className="mr-2"
+          />
+          <label htmlFor="privacy">
+            Ga je akkoord met deze{" "}
+            <a
+              href="/documents/privacyverklaring.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 underline">
+              privacyverklaring
+            </a>
+            ?
+          </label>
+        </div>
+        {errors.privacy && <p className="text-red-500">{errors.privacy}</p>}
         {isUserMade && (
           <div className="flex justify-end text-2xl text-green-400">
             {userId ? (
