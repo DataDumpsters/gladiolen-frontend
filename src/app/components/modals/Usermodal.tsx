@@ -190,6 +190,10 @@ const Usermodal = ({
       return;
     }
     setErrors({});
+
+    // Check if the user has a role of "member" and set the password to null if true
+    const userPassword = role === "Lid" ? null : password;
+
     // Handle user registration logic here
     const registerUser = async () => {
       console.log("Union Id before payload:", unionId);
@@ -200,7 +204,7 @@ const Usermodal = ({
         email,
         role,
         registryNumber,
-        password,
+        password: userPassword,
         tshirt: {
           size,
           sex,
@@ -328,8 +332,9 @@ const Usermodal = ({
             {errors.registryNumber && (
               <p className="text-red-500">{errors.registryNumber}</p>
             )}
-            {showPassword && (
-              <div>
+
+            {role !== "Lid" && (
+              <>
                 <Inputfield
                   name={"password"}
                   placeholder={"wachtwoord"}
@@ -355,7 +360,7 @@ const Usermodal = ({
                 {errors.checkPassword && (
                   <p className="text-red-500">{errors.checkPassword}</p>
                 )}
-              </div>
+              </>
             )}
           </div>
           <div className="flex flex-col gap-2 w-1/2">

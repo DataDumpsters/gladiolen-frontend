@@ -18,7 +18,7 @@ const RootLayout = ({ children }: RootLayoutProps) => {
             {/*    <h1>Gladiolen</h1>*/}
             {/*</div>*/}
           </header>
-          <main className="flex-grow flex items-center justify-center">
+          <main className="flex-grow flex items-center justify-center text-black">
             {children}
           </main>
           <footer className="footer flex-none w-full text-right pr-2 text-white">

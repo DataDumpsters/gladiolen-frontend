@@ -75,22 +75,28 @@ const AdminMembersPage = () => {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const rawUsers = XLSX.utils.sheet_to_json(worksheet);
 
-      const users = rawUsers.map((rawUser: any) => ({
-        firstName: rawUser["First Name"],
-        lastName: rawUser["Last Name"],
-        phoneNumber: rawUser["Phone Number"],
-        role: rawUser["Role"],
-        email: rawUser["Email"],
-        password: rawUser["Password"],
-        registryNumber: rawUser["Registry Number"],
-        tshirt: {
-          size: rawUser["Tshirt Size"],
-          sex: rawUser["Tshirt Sex"],
-          job: rawUser["Tshirt Job"],
-          quantity: rawUser["Tshirt Quantity"],
-        },
-        active: true,
-      }));
+      const users = rawUsers.map((rawUser: any) => {
+        const password =
+          rawUser["Role"] === "Lid" && !rawUser["Password"]
+            ? null
+            : rawUser["Password"];
+        return {
+          firstName: rawUser["First Name"],
+          lastName: rawUser["Last Name"],
+          phoneNumber: rawUser["Phone Number"],
+          role: rawUser["Role"],
+          email: rawUser["Email"],
+          password: password,
+          registryNumber: rawUser["Registry Number"],
+          tshirt: {
+            size: rawUser["Tshirt Size"],
+            sex: rawUser["Tshirt Sex"],
+            job: rawUser["Tshirt Job"],
+            quantity: rawUser["Tshirt Quantity"],
+          },
+          active: true,
+        };
+      });
 
       await fetchWithAuth("http://localhost:8080/admin/users", {
         method: "POST",
