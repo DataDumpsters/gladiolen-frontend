@@ -8,8 +8,6 @@ import Modal from "@/app/components/Modal";
 import TokenOTPmodal from "@/app/components/modals/TokenOTPmodal";
 import Inputfield from "@/app/components/Inputfield";
 import Image from "next/image";
-import fetchWithAuth from "@/app/utils/fetchWithAuth";
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -40,7 +38,9 @@ const Login = () => {
         setOtpModalOpen(true);
       } else {
         const errorMessage = await response.text();
-        setMessage(`Login Failed: ${errorMessage}`);
+        setMessage(
+          `Uw gegevens kloppen niet of u hebt geen toegang met uw account ${errorMessage}`,
+        );
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -100,7 +100,11 @@ const Login = () => {
       <Modal isOpen={otpModalOpen}>
         <TokenOTPmodal onClose={() => setOtpModalOpen(false)} email={emailId} />
       </Modal>
-      {message && <p>{message}</p>}
+      {message && (
+        <div className="flex bg-white text-gladiolentext mt-2 text-2xl rounded-2xl justify-center p-5">
+          {message}
+        </div>
+      )}
     </div>
   );
 };

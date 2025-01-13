@@ -7,6 +7,7 @@ import Dropdown from "@/app/components/Dropdown";
 import FilteredDropdown from "@/app/components/FilteredDropdown";
 import fetchWithAuth from "@/app/utils/fetchWithAuth";
 import { Union } from "@/app/models/Union";
+import { Role } from "@/app/models/Role";
 
 interface UsermodalProps {
   onClose: () => void;
@@ -42,6 +43,7 @@ const Usermodal = ({
   const [unionId, setUnionId] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [isUserMade, setIsUserMade] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
   const [isPrivacyChecked, setIsPrivacyChecked] = useState(false); // New state for privacy checkbox
   const token = useAuthStore((state) => state.accessToken);
   const fetchUsers = useUserStore((state) => state.fetchUsers);
@@ -65,8 +67,8 @@ const Usermodal = ({
             setEmail(user.email);
             setRole(user.role);
             setRegistryNumber(user.registryNumber);
-            setPassword(""); // Clear password fields for security
-            setCheckPassword("");
+            setPassword(user.password); // Clear password fields for security
+            setCheckPassword(user.password);
             setSize(user.tshirt?.size || "");
             setSex(user.tshirt?.sex || "");
             setJob(user.tshirt?.job || "");
@@ -87,6 +89,14 @@ const Usermodal = ({
       setUnionId(user?.union?.id.toString() || "");
     }
   }, [userId]);
+
+  useEffect(() => {
+    if (role === Role.Lid) {
+      setShowPassword(false);
+    } else {
+      setShowPassword(true);
+    }
+  }, [role]);
 
   const validateField = (name: string, value: string) => {
     let error = "";
@@ -109,7 +119,12 @@ const Usermodal = ({
         if (!value) error = "Rol is verplicht";
         break;
       case "registryNumber":
-        if (!value) error = "Registernummer is verplicht";
+        const vatRegex = /^\d{11}$/;
+        if (!value) {
+          error = "Rijksregisternummer is verplicht";
+        } else if (!vatRegex.test(value)) {
+          error = "Rijksregisternummer moet 11 cijfers bevatten";
+        }
         break;
       case "password":
         if (!value) error = "Wachtwoord is verplicht";
@@ -313,29 +328,34 @@ const Usermodal = ({
             {errors.registryNumber && (
               <p className="text-red-500">{errors.registryNumber}</p>
             )}
-            <Inputfield
-              name={"password"}
-              placeholder={"wachtwoord"}
-              label={"Wachtwoord"}
-              value={password}
-              setValue={setPassword}
-              validateField={validateField}
-              type={"password"}
-            />
-            {errors.password && (
-              <p className="text-red-500">{errors.password}</p>
-            )}
-            <Inputfield
-              name={"checkPassword"}
-              placeholder={"check wachtwoord"}
-              label={"Check wachtwoord"}
-              value={checkPassword}
-              setValue={setCheckPassword}
-              validateField={validateField}
-              type={"password"}
-            />
-            {errors.checkPassword && (
-              <p className="text-red-500">{errors.checkPassword}</p>
+            {showPassword && (
+              <div>
+                <Inputfield
+                  name={"password"}
+                  placeholder={"wachtwoord"}
+                  label={"Wachtwoord"}
+                  value={password}
+                  setValue={setPassword}
+                  validateField={validateField}
+                  type={"password"}
+                  className="mb-2"
+                />
+                {errors.password && (
+                  <p className="text-red-500">{errors.password}</p>
+                )}
+                <Inputfield
+                  name={"checkPassword"}
+                  placeholder={"check wachtwoord"}
+                  label={"Check wachtwoord"}
+                  value={checkPassword}
+                  setValue={setCheckPassword}
+                  validateField={validateField}
+                  type={"password"}
+                />
+                {errors.checkPassword && (
+                  <p className="text-red-500">{errors.checkPassword}</p>
+                )}
+              </div>
             )}
           </div>
           <div className="flex flex-col gap-2 w-1/2">
