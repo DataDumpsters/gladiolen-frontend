@@ -70,8 +70,14 @@ const AdminTshirtPage = () => {
         const worksheet = XLSX.utils?.json_to_sheet(dataToExport);
         XLSX.utils.book_append_sheet(workbook, worksheet, worksheetname);
         // Save the workbook as an Excel file
-        XLSX.writeFile(workbook, `${title}.xlsx`);
-        console.log(`Exported data to ${title}.xlsx`);
+        const date = new Date()
+          .toLocaleString("sv-SE", { timeZoneName: "short" })
+          .replace(/-/g, "")
+          .replace(/:/g, "")
+          .replace(" ", "")
+          .replace(" CET", "");
+        XLSX.writeFile(workbook, `${title}${date}.xlsx`);
+        console.log(`Exported data to ${title}${date}.xlsx`);
         setLoading(false);
       } else {
         setLoading(false);
@@ -120,7 +126,7 @@ const AdminTshirtPage = () => {
       </Modal>
       <TshirtsTable sexes={sexes} jobs={jobs} sizes={sizes} tshirts={tshirts} />
       <Button
-        onClick={() => onGetExportProduct("Product", "ProductExport")}
+        onClick={() => onGetExportProduct("TshirtExport_", "TshirtExport")}
         className="text-white py-2 bg-gladiolentext mb-2">
         Export Tshirts
       </Button>
