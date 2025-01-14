@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gladiolen Frontend Setup
 
-## Getting Started
+Deze handleiding legt uit hoe u de Gladiolen frontend-applicatie kunt opzetten en configureren.
 
-First, run the development server:
+## Vereisten
+- Backend en database moeten runnen
+- Een IDE of editor die geschikt is voor NextJS (bijv. IntelliJ IDEA of VS Code met Java-extensies)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Stappen om de frontend op te zetten
+
+### 1. PNPM package manager installeren
+Eerst en vooral moet je het volgende commando runnen:
+npm install -g pnpm
+Dit doe je in de terminal van je pc of je IDE. Op die manier wordt de pnpm package manager globaal geïnstalleerd.
+
+### 2. Dependencies installeren
+Nadien run je het commando:
+pnpm install
+Dit voer je uit in een terminal in de folder waar je frontend-bestanden op je pc staan. Terminal kan opnieuw geopend worden gewoon vanop je pc of in je IDE.
+Bv. C:\Gladiolen\gladiolen-frontend
+
+### 3. Frontend Applicatie Starten
+Je kan de app starten in development modus door het volgende commando te runnen:
+pnpm run dev
+In de terminal van je IDE komt meteen een link te staan naar http://localhost:3000 waar je op kan klikken.
+Als je dit via de terminal van je pc doet, moet je handmatig naar http://localhost:3000 gaan.
+
+### 4. Inloggen
+Inloggen kan je met de gegevens die je gekregen hebt op het startscherm.
+Wanneer je de gegevens ingegeven hebt, krijg je de vraag een OTP-code in te geven. Als je gegevens correct zijn, zal je in de terminal van je backend (in je IDE) die code zien verschijnen
+Geef de code in en je kan zonder problemen aan de slag gaan.
+
+### 5. App builden
+Wanneer de applicatie volledig afgewerkt is, moet je deze builden via het commando:
+pnpm build
+Nadien kan je de app dan starten met:
+pnpm run
+
+## Veelvoorkomende Problemen
+1. **U heeft geen toegang, ondanks dat uw gegevens wel kloppen**  
+   Vermoedelijk is er een probleem met de database en moet u de connectie in de backend oplossen.
+
+Voor verdere vragen of ondersteuning, neem contact op met het ontwikkelteam.
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/layout.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Voor vragen over de app contacteer Matthias Van Rooy via s0173395@student.thomasmore.be
+```
