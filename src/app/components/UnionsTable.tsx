@@ -69,7 +69,9 @@ const UnionTable = ({ unions }: UnionTableProps) => {
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
         </div>
       ) : unions.length === 0 ? (
-        <p>Geen verenigingen gevonden.</p>
+        <div className="text-gladiolentext text-center text-xl bg-white mb-2 rounded-xl p-4">
+          <p>Geen verenigingen gevonden.</p>
+        </div>
       ) : (
         <table className="min-w-full bg-white">
           <thead className={"bg-gladiolentext text-white"}>
