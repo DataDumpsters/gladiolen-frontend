@@ -61,7 +61,7 @@ const TokenOTPmodal = ({ onClose, email }: TokenOTPmodalProps) => {
 
         // Navigate based on the user role
         if (userRole === "Admin") {
-          router.push("/dashboards");
+          router.push("/dashboards/admin/members");
         } else if (userRole === "Hoofdverantwoordelijke") {
           router.push("/dashboards/hoofdverantwoordelijke/vereniging");
         } else {

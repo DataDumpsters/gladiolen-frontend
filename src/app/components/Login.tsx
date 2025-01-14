@@ -59,7 +59,7 @@ const Login = () => {
     <div>
       <form
         onSubmit={handleLogin}
-        className="flex flex-col p-12 bg-white text-gladiolentext shadow-md rounded-xl">
+        className="flex flex-col p-12 bg-white text-gladiolentext shadow-md rounded-xl max-w-xl">
         <Image
           src="/images/LogoBig.svg"
           alt="GladiolenFestival"
@@ -101,7 +101,7 @@ const Login = () => {
         <TokenOTPmodal onClose={() => setOtpModalOpen(false)} email={emailId} />
       </Modal>
       {message && (
-        <div className="flex bg-white text-gladiolentext mt-2 text-2xl rounded-2xl justify-center p-5">
+        <div className="bg-white text-gladiolentext mt-2 text-2xl rounded-2xl justify-center p-5 mx-auto max-w-lg">
           {message}
         </div>
       )}

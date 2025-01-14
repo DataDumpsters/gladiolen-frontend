@@ -189,7 +189,7 @@ const AdminMembersPage = () => {
         style={{ display: "none" }}
       />
       <Button
-        className="text-white py-2 bg-gladiolentext mb-2"
+        className="text-white py-2 bg-gladiolentext my-2"
         onClick={handleImportButtonClick}>
         Import Users
       </Button>
