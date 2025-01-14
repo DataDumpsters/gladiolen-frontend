@@ -9,6 +9,7 @@ import Usermodal from "@/app/components/modals/Usermodal";
 import { useUserStore } from "@/app/stores/userStore";
 import { User } from "@/app/models/User";
 import { Union } from "@/app/models/Union";
+import { Role } from "@/app/models/Role";
 
 interface UserTableProps {
   roles: Role[];
@@ -64,9 +65,7 @@ const UsersTable = ({
     { label: "Voornaam", key: "firstName" },
     { label: "Achternaam", key: "lastName" },
     ...(userRole === "Admin" ? [{ label: "Vereniging", key: "union" }] : []),
-    ...(userRole === "Hoofdverantwoordelijke"
-      ? [{ label: "Rol", key: "role" }]
-      : []),
+    { label: "Rol", key: "role" },
     { label: "Maat", key: "tshirt.size" },
     { label: "Geslacht", key: "tshirt.sex" },
     { label: "Functie", key: "tshirt.job" },
@@ -81,7 +80,9 @@ const UsersTable = ({
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
         </div>
       ) : users.length === 0 ? (
-        <p>Geen medewerkers gevonden.</p>
+        <div className="text-gladiolentext text-center text-xl bg-white mb-2 rounded-xl p-4">
+          <p>Geen medewerkers gevonden.</p>
+        </div>
       ) : (
         <table className="min-w-full bg-white">
           <thead className={"bg-gladiolentext text-white"}>
@@ -104,7 +105,7 @@ const UsersTable = ({
                 {userRole === "Admin" && (
                   <td>{user.union?.name || "Geen vereniging toegewezen"}</td>
                 )}
-                {userRole === "Hoofdverantwoordelijke" && <td>{user.role}</td>}
+                <td>{user.role}</td>
                 <td>{user.tshirt?.size}</td>
                 <td>{user.tshirt?.sex}</td>
                 <td>{user.tshirt?.job}</td>
