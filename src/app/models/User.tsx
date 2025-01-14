@@ -1,3 +1,5 @@
+import { Role } from "@/app/models/Role";
+
 export interface User {
   id: number;
   firstName: string;
