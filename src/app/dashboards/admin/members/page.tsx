@@ -148,7 +148,8 @@ const AdminMembersPage = () => {
           <Button
             className="text-white py-2 bg-gladiolentext mb-2 ml-2"
             onClick={() => setFilteredUnion(null)}>
-            {filteredUnion.name} ({filteredUnion.users?.length}) leden - Filter
+            {filteredUnion.name} ({filteredUnion.users?.length}{" "}
+            {filteredUnion.users?.length === 1 ? "lid" : "leden"}) - Filter
             wissen
           </Button>
         )}
