@@ -204,7 +204,7 @@ const Unionmodal = ({ onClose, unionId, onUnionUpdate }: UnionmodalProps) => {
           <Inputfield
             name={"name"}
             placeholder={"naam"}
-            label={"naam"}
+            label={"Naam"}
             value={name}
             setValue={setName}
             validateField={validateField}

@@ -70,6 +70,13 @@ const Login = () => {
         <h1 className="text-3xl font-bold mb-4">
           Welkom bij GladiolenRegister!
         </h1>
+        <h2 className="mb-4">
+          De registratie-app van{" "}
+          <span className="font-bold underline">
+            het beste klein festival van Europa
+          </span>
+          !
+        </h2>
         <Inputfield
           name={"inputemail"}
           placeholder={"Email"}
