@@ -32,9 +32,9 @@ In de terminal van je IDE komt meteen een link te staan naar http://localhost:30
 Als je dit via de terminal van je pc doet, moet je handmatig naar http://localhost:3000 gaan.
 
 ### 4. Inloggen
-Inloggen kan je met de gegevens die je gekregen hebt op het startscherm.
-Wanneer je de gegevens ingegeven hebt, krijg je de vraag een OTP-code in te geven. Als je gegevens correct zijn, zal je in de terminal van je backend (in je IDE) die code zien verschijnen
-Geef de code in en je kan zonder problemen aan de slag gaan.
+Om als starter in te loggen, moet je momenteel inloggen met emailadres: user2@test.com en wachtwoord: password2
+Wanneer je de gegevens correct ingegeven hebt, krijg je de vraag een OTP-code in te geven. In de terminal van je backend (in je IDE) zal je die code zien verschijnen.
+Geef de code in en je kan zonder problemen aan de slag gaan. We raden uiteraard aan om zo snel mogelijk je gebruikersnaam en wachtwoord aan te passen.
 
 ### 5. App builden
 Wanneer de applicatie volledig afgewerkt is, moet je deze builden via het commando:
